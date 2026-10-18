@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCam.Controls.PlateDiagram">
+    <!-- Assiette dessinée : ½ légumes, ¼ protéines, ¼ complément (les mots sont dans la légende) -->
+    <Border WidthRequest="130" HeightRequest="130" StrokeShape="Ellipse" StrokeThickness="5"
+            Stroke="{StaticResource Bordure}" BackgroundColor="White">
+        <Grid ColumnDefinitions="*,*" RowDefinitions="*,*" ColumnSpacing="2" RowSpacing="2" BackgroundColor="White">
+            <Border Grid.RowSpan="2" BackgroundColor="#6F8F4E" StrokeThickness="0">
+                <Label Text="½" FontFamily="OutfitSemiBold" FontSize="26" TextColor="White"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Border Grid.Column="1" BackgroundColor="#C4673E" StrokeThickness="0">
+                <Label Text="¼" FontFamily="OutfitSemiBold" FontSize="22" TextColor="White"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Border Grid.Column="1" Grid.Row="1" BackgroundColor="#A9772B" StrokeThickness="0">
+                <Label Text="¼" FontFamily="OutfitSemiBold" FontSize="22" TextColor="White"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+    </Border>
+</ContentView>

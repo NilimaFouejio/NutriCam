@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:controls="clr-namespace:NutriCam.Controls" xmlns:h="clr-namespace:NutriCam.Helpers" xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls" ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.BilanPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Votre bilan de la semaine" Style="{StaticResource Titre}" />
+                    <Label Text="Voici comment s’est passée votre semaine à table." Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <Border BackgroundColor="{StaticResource Teinte}" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="18">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="{Binding RatioText}" FontFamily="OutfitSemiBold" FontSize="26" TextColor="{StaticResource Encre}" />
+                        <ProgressBar Progress="{Binding Ratio}" ProgressColor="{StaticResource Terracotta}" />
+                        <Label Text="{Binding Headline}" FontFamily="InterSemiBold" FontSize="14" TextColor="{StaticResource Terracotta}" />
+                        <Label Text="{Binding Message}" Style="{StaticResource Note}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Jour par jour" Style="{StaticResource SectionTitre}" />
+                    <VerticalStackLayout Spacing="14" BindableLayout.ItemsSource="{Binding Days}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="110,*,Auto" ColumnSpacing="12">
+                                    <Label Text="{Binding Day}" Style="{StaticResource Libelle}" FontSize="14" VerticalOptions="Center" />
+                                    <ProgressBar Grid.Column="1" Progress="{Binding Progress}" ProgressColor="{StaticResource Terracotta}"
+                                                 VerticalOptions="Center" />
+                                    <Label Grid.Column="2" Text="{Binding Count}" Style="{StaticResource Note}" VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="12">
+            <Button Text="Commencer une nouvelle semaine" Style="{StaticResource BoutonPrincipal}"
+                    ImageSource="{StaticResource IcoFlecheBlanche}" Command="{Binding NewWeekCommand}" IsEnabled="{Binding IsNotBusy}" />
+            <Button Text="Ajuster mes préférences" Style="{StaticResource BoutonSecondaire}" Command="{Binding AdjustPreferencesCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             x:Class="NutriCam.Controls.AppHeader">
+    <Grid HeightRequest="56" Padding="24,0" ColumnDefinitions="Auto,*,Auto">
+        <Border x:Name="BackButton" Grid.Column="0" WidthRequest="34" HeightRequest="34"
+                StrokeShape="RoundRectangle 17" Stroke="{StaticResource Bordure}" StrokeThickness="1"
+                BackgroundColor="White" VerticalOptions="Center" IsVisible="False">
+            <Label Text="{x:Static h:Icons.ArrowLeft}" Style="{StaticResource Icone}"
+                   TextColor="{StaticResource Encre}" />
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackTapped" />
+            </Border.GestureRecognizers>
+        </Border>
+
+        <HorizontalStackLayout x:Name="Brand" Grid.Column="0" Spacing="7" VerticalOptions="Center">
+            <Label Text="{x:Static h:Icons.Utensils}" Style="{StaticResource Icone}"
+                   TextColor="{StaticResource Terracotta}" FontSize="19" />
+            <Label Text="NutriCam" FontFamily="OutfitSemiBold" FontSize="22"
+                   TextColor="{StaticResource Encre}" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <Label x:Name="Tagline" Grid.Column="2" Text="À votre rythme" FontFamily="InterRegular" FontSize="12"
+               TextColor="{StaticResource EncreDouce}" VerticalOptions="Center" />
+    </Grid>
+</ContentView>

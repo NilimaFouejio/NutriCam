@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.DetailRepasPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding MomentLine}" Style="{StaticResource Surtitre}" />
+                    <Label Text="{Binding Name}" Style="{StaticResource Titre}" />
+                    <Label Text="{Binding Description}" Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <Border HeightRequest="230" StrokeThickness="0" StrokeShape="RoundRectangle 22">
+                    <Image Source="{Binding Image}" Aspect="AspectFill" />
+                </Border>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Un repère pour votre assiette" Style="{StaticResource SectionTitre}" />
+                    <Border Style="{StaticResource Carte}" Padding="12">
+                        <Grid ColumnDefinitions="130,*" ColumnSpacing="16">
+                            <controls:PlateDiagram VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="12" VerticalOptions="Center">
+                                <HorizontalStackLayout Spacing="10">
+                                    <BoxView WidthRequest="14" HeightRequest="14" CornerRadius="7" Color="#6F8F4E" VerticalOptions="Center" />
+                                    <Label Text="½ Légumes" Style="{StaticResource Libelle}" FontSize="14" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="10">
+                                    <BoxView WidthRequest="14" HeightRequest="14" CornerRadius="7" Color="#C4673E" VerticalOptions="Center" />
+                                    <Label Text="¼ Protéines" Style="{StaticResource Libelle}" FontSize="14" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="10">
+                                    <BoxView WidthRequest="14" HeightRequest="14" CornerRadius="7" Color="#A9772B" VerticalOptions="Center" />
+                                    <Label Text="¼ Complément" Style="{StaticResource Libelle}" FontSize="14" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Dans votre assiette" Style="{StaticResource SectionTitre}" />
+                    <Label Text="Touchez un ingrédient pour choisir ce que vous souhaitez remplacer." Style="{StaticResource Note}" />
+                    <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Categories}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="{Binding Fill}" Stroke="{Binding Outline}" StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 14" Padding="16">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                                            <Label Text="{Binding Caption}" Style="{StaticResource Surtitre}" CharacterSpacing="0" />
+                                            <Label Text="{Binding Value}" FontFamily="InterSemiBold" FontSize="14"
+                                                   TextColor="{StaticResource Encre}" />
+                                            <Label Text="{Binding Note}" Style="{StaticResource Note}" FontSize="13"
+                                                   IsVisible="{Binding HasNote}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" Text="{x:Static h:Icons.ChevronRight}" Style="{StaticResource Icone}"
+                                               IsVisible="{Binding IsNotSelected}" />
+                                        <Label Grid.Column="1" Text="{x:Static h:Icons.CircleCheck}" Style="{StaticResource Icone}"
+                                               TextColor="{StaticResource Terracotta}" IsVisible="{Binding IsSelected}" />
+                                    </Grid>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectCommand}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="En cuisine" Style="{StaticResource SectionTitre}" />
+                    <Border Style="{StaticResource Conseil}">
+                        <Label Text="{Binding Preparation}" Style="{StaticResource Note}" />
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Confirmation d'un remplacement -->
+        <Border Grid.Row="1" VerticalOptions="Start" Margin="24,8" Padding="14,12" ZIndex="10"
+                BackgroundColor="{StaticResource Encre}" StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                IsVisible="{Binding BannerVisible}">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Label Text="{x:Static h:Icons.CircleCheck}" Style="{StaticResource Icone}" TextColor="White" />
+                <Label Grid.Column="1" Text="{Binding Banner}" FontFamily="InterRegular" FontSize="13"
+                       TextColor="White" VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="12">
+            <Button Text="{Binding DoneText}" Style="{StaticResource BoutonSecondaire}" Command="{Binding ToggleDoneCommand}" />
+            <Button Text="{Binding ReplaceText}" Style="{StaticResource BoutonPrincipal}"
+                    ImageSource="{StaticResource IcoEchangeBlanc}" Command="{Binding ReplaceCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

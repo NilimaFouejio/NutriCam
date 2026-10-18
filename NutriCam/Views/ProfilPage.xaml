@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.ProfilPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <controls:ProgressSteps Step="1" />
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Parlez-nous de vous" Style="{StaticResource Titre}" />
+                    <Label Text="Quelques repères pour adapter votre programme à votre quotidien."
+                           Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="20">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                        <controls:FormField Title="Âge" Placeholder="28" Suffix="ans" KeyboardType="Numeric"
+                                            Text="{Binding AgeText, Mode=TwoWay}" Error="{Binding AgeError}" />
+                        <controls:FormField Grid.Column="1" Title="Taille" Placeholder="170" Suffix="cm" KeyboardType="Numeric"
+                                            Text="{Binding HeightText, Mode=TwoWay}" Error="{Binding HeightError}" />
+                    </Grid>
+                    <controls:FormField Title="Poids" Placeholder="68" Suffix="kg" KeyboardType="Numeric"
+                                        Text="{Binding WeightText, Mode=TwoWay}" Error="{Binding WeightError}" />
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Niveau d’activité" Style="{StaticResource Libelle}" />
+                        <controls:SegmentedControl Items="Faible,Modéré,Élevé" SelectedIndex="{Binding ActivityIndex, Mode=TwoWay}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Repas par jour" Style="{StaticResource Libelle}" />
+                        <Border Style="{StaticResource Champ}" HeightRequest="56" Padding="10,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border WidthRequest="34" HeightRequest="34" BackgroundColor="{StaticResource Creme}"
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                                    <Label Text="{x:Static h:Icons.Minus}" Style="{StaticResource Icone}"
+                                           TextColor="{StaticResource Encre}" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding DecreaseCommand}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <Label Grid.Column="1" Text="{Binding MealsLabel}" FontFamily="InterSemiBold" FontSize="15"
+                                       TextColor="{StaticResource Encre}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Border Grid.Column="2" WidthRequest="34" HeightRequest="34" BackgroundColor="{StaticResource Teinte}"
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                                    <Label Text="{x:Static h:Icons.Plus}" Style="{StaticResource Icone}"
+                                           TextColor="{StaticResource Terracotta}" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding IncreaseCommand}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Conseil}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Text="{x:Static h:Icons.LockKeyhole}" Style="{StaticResource Icone}" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Style="{StaticResource Note}"
+                               Text="Ces informations servent uniquement à personnaliser vos repères alimentaires. NutriCam ne remplace pas un avis médical." />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20">
+            <Button Text="Continuer" Style="{StaticResource BoutonPrincipal}"
+                    ImageSource="{StaticResource IcoFlecheBlanche}" Command="{Binding ContinueCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

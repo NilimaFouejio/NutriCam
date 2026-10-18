@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.PreferencesPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <controls:ProgressSteps Step="3" />
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Vos goûts comptent" Style="{StaticResource Titre}" />
+                    <Label Text="Choisissez ce que vous aimez et ce que vous préférez laisser de côté."
+                           Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="J’aime" Style="{StaticResource SectionTitre}" />
+                    <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignItems="Start"
+                                BindableLayout.ItemsSource="{Binding Liked}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <controls:ChipView Text="{Binding Label}" IsSelected="{Binding IsSelected}"
+                                                   Command="{Binding ToggleCommand}" Margin="0,0,8,8" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Allergies ou intolérances" Style="{StaticResource SectionTitre}" />
+                    <Label Text="Ces aliments seront toujours exclus de vos repas." Style="{StaticResource Note}" />
+                    <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignItems="Start"
+                                BindableLayout.ItemsSource="{Binding Allergies}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <controls:ChipView Text="{Binding Label}" IsSelected="{Binding IsSelected}"
+                                                   SelectedGlyph="{x:Static h:Icons.X}"
+                                                   Command="{Binding ToggleCommand}" Margin="0,0,8,8" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Je préfère éviter" Style="{StaticResource SectionTitre}" />
+                    <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignItems="Start"
+                                BindableLayout.ItemsSource="{Binding Avoided}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <controls:ChipView Text="{Binding Label}" IsSelected="{Binding IsSelected}"
+                                                   SelectedGlyph="{x:Static h:Icons.X}"
+                                                   Command="{Binding ToggleCommand}" Margin="0,0,8,8" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <controls:FormField Title="Un autre aliment ?" Placeholder="Ajouter un aliment"
+                                            Text="{Binding NewAvoided, Mode=TwoWay}" />
+                        <Border Grid.Column="1" WidthRequest="54" HeightRequest="54" VerticalOptions="End"
+                                BackgroundColor="{StaticResource Teinte}" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                            <Label Text="{x:Static h:Icons.Plus}" Style="{StaticResource Icone}" FontSize="20"
+                                   TextColor="{StaticResource Terracotta}" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding AddAvoidedCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Conseil}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Text="{x:Static h:Icons.Info}" Style="{StaticResource Icone}" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Style="{StaticResource Note}"
+                               Text="Les allergies et les aliments évités seront exclus de votre programme. En cas d’allergie sévère, suivez l’avis de votre médecin." />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20">
+            <Button Text="Continuer" Style="{StaticResource BoutonPrincipal}"
+                    ImageSource="{StaticResource IcoFlecheBlanche}" Command="{Binding ContinueCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

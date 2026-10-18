@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCam.Controls.FormField">
+    <VerticalStackLayout Spacing="8">
+        <Label x:Name="TitleLabel" Style="{StaticResource Libelle}" />
+        <Border x:Name="Box" Style="{StaticResource Champ}" Padding="16,0">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                <Entry x:Name="Input" VerticalOptions="Center" />
+                <Label x:Name="SuffixLabel" Grid.Column="1" Style="{StaticResource Note}"
+                       VerticalOptions="Center" IsVisible="False" />
+                <Label x:Name="IconLabel" Grid.Column="2" Style="{StaticResource Icone}"
+                       VerticalOptions="Center" IsVisible="False">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnIconTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+        </Border>
+        <Label x:Name="ErrorLabel" Style="{StaticResource Erreur}" IsVisible="False" />
+    </VerticalStackLayout>
+</ContentView>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Palette extraite de la maquette Figma : crème / terracotta / beige -->
+    <Color x:Key="Fond">#FAF6F0</Color>
+    <Color x:Key="Encre">#392B25</Color>
+    <Color x:Key="EncreDouce">#6B5A50</Color>
+    <Color x:Key="Terracotta">#9C4529</Color>
+    <Color x:Key="Teinte">#F4E5DC</Color>
+    <Color x:Key="Creme">#F1EBE3</Color>
+    <Color x:Key="Bordure">#E5D9CD</Color>
+    <Color x:Key="Erreur">#B3402A</Color>
+
+</ResourceDictionary>

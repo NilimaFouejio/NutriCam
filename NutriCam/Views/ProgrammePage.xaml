@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.ProgrammePage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="False" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="22">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Une semaine à savourer" Style="{StaticResource Titre}" />
+                    <Label Text="7 jours de repas. Choisissez un jour pour retrouver son menu."
+                           Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <FlexLayout Direction="Row" Margin="0,0,-5,0" BindableLayout.ItemsSource="{Binding Days}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border FlexLayout.Grow="1" HeightRequest="56" Margin="0,0,5,0"
+                                    BackgroundColor="{Binding Fill}" StrokeThickness="0" StrokeShape="RoundRectangle 12">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label Text="{Binding Label}" FontFamily="InterSemiBold" FontSize="12"
+                                           TextColor="{Binding TextColor}" HorizontalOptions="Center" />
+                                    <Label Text="{Binding Marker}" FontFamily="InterSemiBold" FontSize="12"
+                                           TextColor="{Binding TextColor}" HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectCommand}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+
+                <Label Text="{Binding SectionTitle}" Style="{StaticResource SectionTitre}" />
+
+                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Meals}">
+                    <BindableLayout.ItemTemplateSelector>
+                        <controls:MealTemplateSelector>
+                            <controls:MealTemplateSelector.Compact>
+                                <DataTemplate>
+                                    <controls:MealRow />
+                                </DataTemplate>
+                            </controls:MealTemplateSelector.Compact>
+                            <controls:MealTemplateSelector.Featured>
+                                <DataTemplate>
+                                    <controls:MealFeatured />
+                                </DataTemplate>
+                            </controls:MealTemplateSelector.Featured>
+                        </controls:MealTemplateSelector>
+                    </BindableLayout.ItemTemplateSelector>
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Conseil}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Text="{x:Static h:Icons.ArrowLeftRight}" Style="{StaticResource Icone}" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Style="{StaticResource Note}"
+                               Text="Ouvrez un repas pour découvrir sa composition ou remplacer un aliment." />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:BottomNav Grid.Row="2" Active="programme" />
+    </Grid>
+</ContentPage>

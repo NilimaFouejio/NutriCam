@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCam.Controls.MealFeatured">
+    <!-- BindingContext : un MealItem (repas mis en avant : grande photo) -->
+    <Border Style="{StaticResource Carte}" StrokeThickness="0" Padding="0">
+        <VerticalStackLayout>
+            <Image Source="{Binding Image}" Aspect="AspectFill" HeightRequest="156" />
+            <VerticalStackLayout Padding="16" Spacing="5">
+                <Label Text="{Binding Moment}" Style="{StaticResource Surtitre}" CharacterSpacing="0" />
+                <Label Text="{Binding Name}" FontFamily="OutfitSemiBold" FontSize="21"
+                       TextColor="{StaticResource Encre}" />
+                <Label Text="{Binding Ingredients}" FontFamily="InterRegular" FontSize="12"
+                       TextColor="{StaticResource EncreDouce}" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding OpenCommand}" />
+        </Border.GestureRecognizers>
+    </Border>
+</ContentView>

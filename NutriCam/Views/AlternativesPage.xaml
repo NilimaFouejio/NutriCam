@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.AlternativesPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{Binding Title}" Style="{StaticResource Titre}" />
+                    <Label Text="{Binding Subtitle}" Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Carte}" Padding="12">
+                    <Grid ColumnDefinitions="64,*" ColumnSpacing="14">
+                        <Border HeightRequest="72" StrokeThickness="0" StrokeShape="RoundRectangle 12">
+                            <Image Source="{Binding Image}" Aspect="AspectFill" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                            <Label Text="{Binding MomentLine}" Style="{StaticResource Note}" FontSize="12" />
+                            <Label Text="{Binding CurrentLabel}" FontFamily="InterSemiBold" FontSize="15"
+                                   TextColor="{StaticResource Encre}" />
+                            <Label Text="{Binding CategoryLine}" FontFamily="InterRegular" FontSize="13"
+                                   TextColor="{StaticResource Terracotta}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="À la place, je choisis…" Style="{StaticResource SectionTitre}" />
+                    <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Options}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <controls:OptionCard Title="{Binding Title}" Subtitle="{Binding Subtitle}"
+                                                     Glyph="{Binding Glyph}" IsSelected="{Binding IsSelected}"
+                                                     Command="{Binding SelectCommand}" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Label Text="{Binding EmptyMessage}" Style="{StaticResource Note}"
+                           IsVisible="{Binding EmptyMessage, Converter={StaticResource NotEmpty}}" />
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Conseil}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Text="{x:Static h:Icons.Info}" Style="{StaticResource Icone}" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Style="{StaticResource Note}"
+                               Text="Ces choix sont de la même catégorie alimentaire, sans équivalence calorique garantie." />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="12">
+            <Button Text="{Binding ConfirmText}" Style="{StaticResource BoutonPrincipal}"
+                    Command="{Binding ConfirmCommand}" IsEnabled="{Binding HasOptions}" />
+            <Label Text="{Binding Helper}" Style="{StaticResource Note}" FontSize="13" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

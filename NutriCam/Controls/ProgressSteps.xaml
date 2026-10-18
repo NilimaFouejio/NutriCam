@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCam.Controls.ProgressSteps">
+    <VerticalStackLayout Spacing="10">
+        <Label x:Name="StepLabel" Style="{StaticResource Surtitre}" />
+        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
+            <BoxView x:Name="Bar1" Grid.Column="0" HeightRequest="3" CornerRadius="2" />
+            <BoxView x:Name="Bar2" Grid.Column="1" HeightRequest="3" CornerRadius="2" />
+            <BoxView x:Name="Bar3" Grid.Column="2" HeightRequest="3" CornerRadius="2" />
+            <BoxView x:Name="Bar4" Grid.Column="3" HeightRequest="3" CornerRadius="2" />
+        </Grid>
+    </VerticalStackLayout>
+</ContentView>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             x:Class="NutriCam.Controls.BottomNav">
+    <Grid RowDefinitions="1,Auto" BackgroundColor="White">
+        <BoxView Color="{StaticResource Bordure}" HeightRequest="1" />
+        <Grid Grid.Row="1" Padding="24,10,24,12" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+            <Border x:Name="HomeBox" Grid.Column="0" HeightRequest="55" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label x:Name="HomeIcon" Text="{x:Static h:Icons.House}" Style="{StaticResource Icone}" FontSize="20" />
+                    <Label x:Name="HomeCaption" Text="Accueil" FontFamily="InterSemiBold" FontSize="12" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Border x:Name="ProgramBox" Grid.Column="1" HeightRequest="55" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label x:Name="ProgramIcon" Text="{x:Static h:Icons.CalendarDays}" Style="{StaticResource Icone}" FontSize="20" />
+                    <Label x:Name="ProgramCaption" Text="Programme" FontFamily="InterSemiBold" FontSize="12" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnProgramTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Border x:Name="ProfileBox" Grid.Column="2" HeightRequest="55" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label x:Name="ProfileIcon" Text="{x:Static h:Icons.UserRound}" Style="{StaticResource Icone}" FontSize="20" />
+                    <Label x:Name="ProfileCaption" Text="Profil" FontFamily="InterSemiBold" FontSize="12" />
+                </VerticalStackLayout>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnProfileTapped" />
+                </Border.GestureRecognizers>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentView>

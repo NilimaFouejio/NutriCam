@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.DashboardPage">
+    <Grid>
+        <Grid RowDefinitions="Auto,*,Auto">
+            <controls:AppHeader ShowBack="False" />
+
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Padding="24,18,24,16" Spacing="22">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Bonjour, à table !" Style="{StaticResource Titre}" />
+                        <Label Text="Voici vos repas pour aujourd’hui." Style="{StaticResource Intro}" />
+                    </VerticalStackLayout>
+
+                    <Border BackgroundColor="{StaticResource Teinte}" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 18" Padding="18">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Votre objectif" Style="{StaticResource Surtitre}" CharacterSpacing="0" />
+                                <Label Grid.Column="1" Text="{Binding DayProgress}" Style="{StaticResource Lien}" FontSize="12" />
+                            </Grid>
+                            <Label Text="{Binding GoalHeadline}" FontFamily="OutfitSemiBold" FontSize="21"
+                                   TextColor="{StaticResource Encre}" />
+                            <FlexLayout Direction="Row" Margin="0,0,-5,0" BindableLayout.ItemsSource="{Binding Bars}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <BoxView HeightRequest="4" CornerRadius="2" Color="{Binding Fill}"
+                                                 FlexLayout.Grow="1" Margin="0,0,5,0" />
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border IsVisible="{Binding WeekFinished}" Style="{StaticResource Carte}" Stroke="{StaticResource Terracotta}" Padding="18">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Votre semaine est terminée" Style="{StaticResource SectionTitre}" />
+                            <Label Text="Découvrez votre bilan, puis lancez une nouvelle semaine de repas." Style="{StaticResource Note}" />
+                            <Button Text="Voir mon bilan" Style="{StaticResource BoutonPrincipal}"
+                                    ImageSource="{StaticResource IcoFlecheBlanche}" Command="{Binding OpenBilanCommand}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <VerticalStackLayout Spacing="22" IsVisible="{Binding WeekActive}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Au menu aujourd’hui" Style="{StaticResource SectionTitre}" />
+                        <Label Grid.Column="1" Text="{Binding TodayName}" Style="{StaticResource Note}" VerticalOptions="Center" />
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Meals}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <controls:MealRow />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="14">
+                        <Button Text="Voir ma semaine" Style="{StaticResource BoutonPrincipal}"
+                                ImageSource="{StaticResource IcoFlecheBlanche}" Command="{Binding SeeWeekCommand}" />
+                        <Label Text="Régénérer mon programme" Style="{StaticResource Lien}" HorizontalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding RegenerateCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <controls:BottomNav Grid.Row="2" Active="home" />
+        </Grid>
+
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#E6FAF6F0">
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}" Color="{StaticResource Terracotta}" />
+                <Label Text="Nous composons votre semaine…" Style="{StaticResource SectionTitre}" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

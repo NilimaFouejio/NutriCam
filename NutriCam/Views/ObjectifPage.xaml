@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.ObjectifPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <controls:ProgressSteps Step="2" />
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="À chacun son objectif" Style="{StaticResource Titre}" />
+                    <Label Text="Choisissez ce qui compte pour vous. Vous pourrez le changer à tout moment."
+                           Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Options}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <controls:OptionCard Title="{Binding Title}" Subtitle="{Binding Subtitle}"
+                                                 Glyph="{Binding Glyph}" IsSelected="{Binding IsSelected}"
+                                                 Command="{Binding SelectCommand}" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Label Text="On avance à votre rythme, un repas à la fois." Style="{StaticResource Note}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20">
+            <Button Text="Continuer" Style="{StaticResource BoutonPrincipal}"
+                    ImageSource="{StaticResource IcoFlecheBlanche}" Command="{Binding ContinueCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

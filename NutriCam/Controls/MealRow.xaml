@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             x:Class="NutriCam.Controls.MealRow">
+    <!-- BindingContext : un MealItem -->
+    <Border Style="{StaticResource Carte}" StrokeThickness="0" Padding="10">
+        <Grid ColumnDefinitions="82,*,Auto" ColumnSpacing="12">
+            <Border WidthRequest="82" HeightRequest="88" StrokeThickness="0" StrokeShape="RoundRectangle 12">
+                <Image Source="{Binding Image}" Aspect="AspectFill" />
+            </Border>
+            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                <Label Text="{Binding Moment}" Style="{StaticResource Surtitre}" CharacterSpacing="0" />
+                <Label Text="{Binding Name}" FontFamily="OutfitSemiBold" FontSize="18"
+                       TextColor="{StaticResource Encre}" />
+                <Label Text="{Binding Ingredients}" FontFamily="InterRegular" FontSize="12"
+                       TextColor="{StaticResource EncreDouce}" MaxLines="1" LineBreakMode="TailTruncation" />
+            </VerticalStackLayout>
+            <Label Grid.Column="2" Text="{x:Static h:Icons.ChevronRight}" Style="{StaticResource Icone}"
+                   VerticalOptions="Center" />
+        </Grid>
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding OpenCommand}" />
+        </Border.GestureRecognizers>
+    </Border>
+</ContentView>

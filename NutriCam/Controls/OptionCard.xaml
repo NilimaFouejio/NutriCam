@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCam.Controls.OptionCard">
+    <Border x:Name="Card" StrokeShape="RoundRectangle 18" StrokeThickness="1" Padding="16">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+            <Border WidthRequest="40" HeightRequest="40" BackgroundColor="{StaticResource Fond}"
+                    StrokeThickness="0" StrokeShape="RoundRectangle 12" VerticalOptions="Center">
+                <Label x:Name="Pictogram" Style="{StaticResource Icone}" FontSize="20"
+                       TextColor="{StaticResource Terracotta}" />
+            </Border>
+            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                <Label x:Name="TitleLabel" FontFamily="InterSemiBold" FontSize="15"
+                       TextColor="{StaticResource Encre}" />
+                <Label x:Name="SubtitleLabel" FontFamily="InterRegular" FontSize="13"
+                       TextColor="{StaticResource EncreDouce}" />
+            </VerticalStackLayout>
+            <Border x:Name="Radio" Grid.Column="2" WidthRequest="18" HeightRequest="18"
+                    StrokeShape="RoundRectangle 9" StrokeThickness="1" VerticalOptions="Center" />
+        </Grid>
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTapped" />
+        </Border.GestureRecognizers>
+    </Border>
+</ContentView>

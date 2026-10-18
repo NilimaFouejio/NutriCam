@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.ConnexionPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <Border HeightRequest="172" StrokeThickness="0" StrokeShape="RoundRectangle 22">
+                    <Image Source="petit_dejeuner.jpg" Aspect="AspectFill" />
+                </Border>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Bon retour à table !" Style="{StaticResource Titre}" />
+                    <Label Text="Connectez-vous pour retrouver vos repas et votre programme." Style="{StaticResource Intro}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="20">
+                    <controls:FormField Title="E-mail" Placeholder="Votre adresse e-mail"
+                                        Text="{Binding Email, Mode=TwoWay}" Error="{Binding EmailError}"
+                                        KeyboardType="Email" LeadingGlyph="{x:Static h:Icons.Mail}" />
+                    <controls:FormField Title="Mot de passe" Placeholder="Votre mot de passe"
+                                        Text="{Binding Password, Mode=TwoWay}" Error="{Binding PasswordError}"
+                                        IsPasswordField="True" />
+                    <Label Text="Mot de passe oublié ?" Style="{StaticResource Lien}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label Text="{Binding FormError}" Style="{StaticResource Erreur}"
+                           IsVisible="{Binding FormError, Converter={StaticResource NotEmpty}}" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="14">
+            <Button Text="{Binding LoginText}" Style="{StaticResource BoutonPrincipal}"
+                    Command="{Binding LoginCommand}" IsEnabled="{Binding IsNotBusy}" />
+            <Button Text="Créer un compte" Style="{StaticResource BoutonSecondaire}"
+                    Command="{Binding CreateAccountCommand}" IsEnabled="{Binding IsNotBusy}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
