@@ -60,7 +60,24 @@
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
 
+                    <Label Text="{Binding DayEnergy}" Style="{StaticResource Note}" FontSize="13"
+                           IsVisible="{Binding DayEnergy, Converter={StaticResource NotEmpty}}" />
+
                     </VerticalStackLayout>
+
+                    <Border Style="{StaticResource Carte}" Padding="16" IsVisible="{Binding WeekActive}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Border WidthRequest="40" HeightRequest="40" BackgroundColor="{StaticResource Fond}"
+                                    StrokeThickness="0" StrokeShape="RoundRectangle 12" VerticalOptions="Start">
+                                <Label Text="{x:Static h:Icons.Sprout}" Style="{StaticResource Icone}" FontSize="20"
+                                       TextColor="{StaticResource Terracotta}" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Bouger cette semaine" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource Encre}" />
+                                <Label Text="{Binding ActivitySummary}" Style="{StaticResource Note}" FontSize="13" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
 
                     <VerticalStackLayout Spacing="14">
                         <Button Text="Voir ma semaine" Style="{StaticResource BoutonPrincipal}"

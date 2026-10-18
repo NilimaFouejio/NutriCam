@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NutriCam.Helpers;
+using NutriCam.Models;
 using NutriCam.Services;
 
 namespace NutriCam.ViewModels;
@@ -36,9 +37,9 @@ public partial class ReglagesViewModel : BaseViewModel
 
         Rows.Clear();
         Rows.Add(new SettingsRow("Profil", profile, Icons.UserRound, () => Edit("profil")));
-        Rows.Add(new SettingsRow("Objectif", GoalNames[(int)data.Goal], Icons.Scale, () => Edit("objectif")));
+        Rows.Add(new SettingsRow("Objectif", GoalNames[(int)(data.Goal ?? Goal.Equilibrer)], Icons.Scale, () => Edit("objectif")));
         Rows.Add(new SettingsRow("Goûts et allergies", tastes, Icons.Carrot, () => Edit("preferences")));
-        Rows.Add(new SettingsRow("Budget et disponibilité", $"Budget {BudgetNames[(int)data.Budget]} · {data.Available.Count} aliments faciles à trouver", Icons.Wheat, () => Edit("budget")));
+        Rows.Add(new SettingsRow("Budget et disponibilité", $"Budget {BudgetNames[(int)(data.Budget ?? BudgetLevel.Moyen)]} · {data.Available.Count} aliments faciles à trouver", Icons.Wheat, () => Edit("budget")));
         if (Store.HasProgram)
             Rows.Add(new SettingsRow("Bilan de la semaine", $"{Store.DoneCount} repas mangés sur {Store.MealCount}", Icons.CalendarDays, () => Go("bilan")));
     }

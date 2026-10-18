@@ -102,6 +102,7 @@ public partial class PreferencesViewModel : BaseViewModel
         Store.Data.Allergies = Allergies.Where(c => c.IsSelected).Select(c => c.Label).ToList();
         Store.Data.Avoided = Avoided.Where(c => c.IsSelected).Select(c => c.Label).ToList();
         Store.Save();
+        if (await ReturnToRecapIfRequested()) return;
         await Go("budget");
     }
 }

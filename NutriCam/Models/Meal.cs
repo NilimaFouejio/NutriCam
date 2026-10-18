@@ -18,6 +18,18 @@ public class Meal
     public string Preparation { get; set; } = "";
     public bool Done { get; set; }
 
+    /// <summary>Valeur énergétique estimée du repas, en kcal (0 = non calculée).</summary>
+    public int Kcal { get; set; }
+
+    /// <summary>Taille des portions de protéines et de féculents, ajustée au besoin énergétique de la personne (1 = portion standard).</summary>
+    public double PortionFactor { get; set; } = 1;
+
+    [JsonIgnore]
+    public bool HasKcal => Kcal > 0;
+
+    [JsonIgnore]
+    public string KcalText => Kcal > 0 ? $"≈ {Kcal} kcal" : "";
+
     [JsonIgnore]
     public string Image => Moment switch
     {

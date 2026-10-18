@@ -9,22 +9,22 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:AppHeader ShowBack="True" />
 
-        <ScrollView Grid.Row="1">
+        <ScrollView x:Name="Scroller" Grid.Row="1">
             <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Bienvenue à votre table." Style="{StaticResource Titre}" />
                     <Label Text="Créons votre compte. Quelques secondes suffisent." Style="{StaticResource Intro}" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="20">
-                    <controls:FormField Title="Prénom" Placeholder="Votre prénom"
+                    <controls:FormField x:Name="FirstNameField" Title="Prénom" Placeholder="Votre prénom"
                                         Text="{Binding FirstName, Mode=TwoWay}" Error="{Binding FirstNameError}" />
-                    <controls:FormField Title="E-mail" Placeholder="Votre adresse e-mail"
+                    <controls:FormField x:Name="EmailField" Title="E-mail" Placeholder="Votre adresse e-mail"
                                         Text="{Binding Email, Mode=TwoWay}" Error="{Binding EmailError}"
                                         KeyboardType="Email" LeadingGlyph="{x:Static h:Icons.Mail}" />
-                    <controls:FormField Title="Mot de passe" Placeholder="8 caractères minimum"
+                    <controls:FormField x:Name="PasswordField" Title="Mot de passe" Placeholder="8 caractères minimum"
                                         Text="{Binding Password, Mode=TwoWay}" Error="{Binding PasswordError}"
                                         IsPasswordField="True" />
-                    <controls:FormField Title="Confirmer le mot de passe" Placeholder="Saisissez-le à nouveau"
+                    <controls:FormField x:Name="ConfirmationField" Title="Confirmer le mot de passe" Placeholder="Saisissez-le à nouveau"
                                         Text="{Binding Confirmation, Mode=TwoWay}" Error="{Binding ConfirmationError}"
                                         IsPasswordField="True" />
                 </VerticalStackLayout>

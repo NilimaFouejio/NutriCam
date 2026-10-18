@@ -18,12 +18,12 @@ public partial class BottomNav : ContentView
 
     private void Update()
     {
-        Style(HomeBox, HomeIcon, HomeCaption, Active == "home");
-        Style(ProgramBox, ProgramIcon, ProgramCaption, Active == "programme");
-        Style(ProfileBox, ProfileIcon, ProfileCaption, Active == "profil");
+        ApplyStyle(HomeBox, HomeIcon, HomeCaption, Active == "home");
+        ApplyStyle(ProgramBox, ProgramIcon, ProgramCaption, Active == "programme");
+        ApplyStyle(ProfileBox, ProfileIcon, ProfileCaption, Active == "profil");
     }
 
-    private static void Style(Border box, Label icon, Label caption, bool active)
+    private static void ApplyStyle(Border box, Label icon, Label caption, bool active)
     {
         box.BackgroundColor = active ? Palette.Teinte : Colors.Transparent;
         icon.TextColor = active ? Palette.Terracotta : Palette.EncreDouce;
@@ -32,16 +32,16 @@ public partial class BottomNav : ContentView
 
     private async void OnHomeTapped(object? sender, TappedEventArgs e)
     {
-        if (Active != "home") await Shell.Current.GoToAsync("//dashboard");
+        if (Active != "home") await Nav.GoAsync("//dashboard");
     }
 
     private async void OnProgramTapped(object? sender, TappedEventArgs e)
     {
-        if (Active != "programme") await Shell.Current.GoToAsync("//programme");
+        if (Active != "programme") await Nav.GoAsync("//programme");
     }
 
     private async void OnProfileTapped(object? sender, TappedEventArgs e)
     {
-        if (Active != "profil") await Shell.Current.GoToAsync("//reglages");
+        if (Active != "profil") await Nav.GoAsync("//reglages");
     }
 }

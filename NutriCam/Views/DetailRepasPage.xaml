@@ -15,6 +15,9 @@
                     <Label Text="{Binding MomentLine}" Style="{StaticResource Surtitre}" />
                     <Label Text="{Binding Name}" Style="{StaticResource Titre}" />
                     <Label Text="{Binding Description}" Style="{StaticResource Intro}" />
+                    <Label Text="{Binding EnergyLine}" FontFamily="InterSemiBold" FontSize="15"
+                           TextColor="{StaticResource Terracotta}" IsVisible="{Binding EnergyLine, Converter={StaticResource NotEmpty}}" />
+                    <Label Text="{Binding EnergyNote}" Style="{StaticResource Note}" FontSize="13" IsVisible="{Binding HasEnergyNote}" />
                 </VerticalStackLayout>
 
                 <Border HeightRequest="230" StrokeThickness="0" StrokeShape="RoundRectangle 22">

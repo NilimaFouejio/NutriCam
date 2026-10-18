@@ -10,7 +10,7 @@
         <Grid RowDefinitions="Auto,*,Auto">
             <controls:AppHeader ShowBack="True" />
 
-            <ScrollView Grid.Row="1">
+            <ScrollView x:Name="Scroller" Grid.Row="1">
                 <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
                     <controls:ProgressSteps Step="4" />
                     <VerticalStackLayout Spacing="10">
@@ -19,12 +19,14 @@
                                Style="{StaticResource Intro}" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="12">
+                    <VerticalStackLayout x:Name="BudgetBlock" Spacing="12">
                         <Label Text="Votre budget" Style="{StaticResource SectionTitre}" />
                         <controls:SegmentedControl Items="Économique,Moyen,Confort" SelectedIndex="{Binding BudgetIndex, Mode=TwoWay}" />
+                        <Label Text="{Binding BudgetError}" Style="{StaticResource Erreur}"
+                               IsVisible="{Binding BudgetError, Converter={StaticResource NotEmpty}}" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="12">
+                    <VerticalStackLayout x:Name="AvailableBlock" Spacing="12">
                         <Label Text="Faciles à trouver près de vous" Style="{StaticResource SectionTitre}" />
                         <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignItems="Start"
                                     BindableLayout.ItemsSource="{Binding Available}">
@@ -38,37 +40,17 @@
                         <Label Text="{Binding AvailableError}" Style="{StaticResource Erreur}"
                                IsVisible="{Binding AvailableError, Converter={StaticResource NotEmpty}}" />
                     </VerticalStackLayout>
-
-                    <Border BackgroundColor="{StaticResource Teinte}" StrokeThickness="0"
-                            StrokeShape="RoundRectangle 18" Padding="18">
-                        <VerticalStackLayout Spacing="12">
-                            <HorizontalStackLayout Spacing="8">
-                                <Label Text="{x:Static h:Icons.Utensils}" Style="{StaticResource Icone}"
-                                       TextColor="{StaticResource Terracotta}" />
-                                <Label Text="{Binding GoalLabel}" FontFamily="InterSemiBold" FontSize="14"
-                                       TextColor="{StaticResource Encre}" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="{Binding Summary}" Style="{StaticResource Note}" />
-                        </VerticalStackLayout>
-                    </Border>
                 </VerticalStackLayout>
             </ScrollView>
 
             <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="14">
-                <Button Text="{Binding GenerateText}" Style="{StaticResource BoutonPrincipal}"
+                <Button Text="Voir le récapitulatif" Style="{StaticResource BoutonPrincipal}"
                         ImageSource="{StaticResource IcoFlecheBlanche}"
-                        Command="{Binding GenerateCommand}" IsEnabled="{Binding IsNotBusy}" />
-                <Label Text="Vos choix restent modifiables." Style="{StaticResource Note}"
+                        Command="{Binding ContinueCommand}" />
+                <Label Text="Vous pourrez tout vérifier avant de générer." Style="{StaticResource Note}"
                        FontSize="13" HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
 
-        <!-- Écran d'attente pendant la génération -->
-        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#E6FAF6F0">
-            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
-                <ActivityIndicator IsRunning="{Binding IsBusy}" Color="{StaticResource Terracotta}" />
-                <Label Text="Nous composons votre semaine…" Style="{StaticResource SectionTitre}" />
-            </VerticalStackLayout>
-        </Grid>
     </Grid>
 </ContentPage>

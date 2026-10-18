@@ -9,7 +9,7 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:AppHeader ShowBack="True" />
 
-        <ScrollView Grid.Row="1">
+        <ScrollView x:Name="Scroller" Grid.Row="1">
             <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
                 <controls:ProgressSteps Step="2" />
                 <VerticalStackLayout Spacing="10">
@@ -18,7 +18,7 @@
                            Style="{StaticResource Intro}" />
                 </VerticalStackLayout>
 
-                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Options}">
+                <VerticalStackLayout x:Name="GoalList" Spacing="12" BindableLayout.ItemsSource="{Binding Options}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <controls:OptionCard Title="{Binding Title}" Subtitle="{Binding Subtitle}"
@@ -28,6 +28,8 @@
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
 
+                <Label Text="{Binding Error}" Style="{StaticResource Erreur}"
+                       IsVisible="{Binding Error, Converter={StaticResource NotEmpty}}" />
                 <Label Text="On avance à votre rythme, un repas à la fois." Style="{StaticResource Note}" />
             </VerticalStackLayout>
         </ScrollView>

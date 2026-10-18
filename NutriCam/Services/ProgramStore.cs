@@ -17,6 +17,7 @@ public class ProgramStore
     public ProgramStore()
     {
         Data = Load();
+        EnsureEnergy();
     }
 
     public AppData Data { get; private set; }
@@ -28,6 +29,31 @@ public class ProgramStore
 
     /// <summary>Vrai quand le parcours « Votre programme » est relancé depuis l'onglet Profil.</summary>
     public bool EditMode { get; set; }
+
+    /// <summary>Vrai quand une étape est rouverte depuis le récapitulatif : elle y revient au lieu de poursuivre le parcours.</summary>
+    public bool ReturnToRecap { get; set; }
+
+    /// <summary>Vrai si la personne a déclaré une maladie ou une situation qui exige un suivi médical : aucun programme n'est proposé.</summary>
+    public bool IsBlocked => Data.Profile.Conditions.Count > 0;
+
+    /// <summary>Retire tout programme existant : un suivi médical remplace NutriCam dans cette situation.</summary>
+    public void BlockProgram()
+    {
+        Data.Program = new List<Meal>();
+        Data.StartDate = null;
+        CurrentMeal = null;
+        EditMode = false;
+        ReturnToRecap = false;
+        Save();
+    }
+
+    /// <summary>Programmes enregistrés avant l'ajout de la valeur énergétique : on la calcule au démarrage.</summary>
+    private void EnsureEnergy()
+    {
+        if (Data.Program.Count == 0 || Data.Program.All(m => m.Kcal > 0)) return;
+        NutritionCalculator.ApplyToProgram(Data.Program, NutritionCalculator.DailyTarget(Data));
+        Save();
+    }
 
     public bool HasProgram => Data.Program.Count > 0 && Data.StartDate is not null;
 
@@ -85,6 +111,7 @@ public class ProgramStore
     // --- Programme ---
     public void GenerateProgram()
     {
+        if (IsBlocked) return; // sécurité : aucun programme pour une personne qui doit consulter un médecin
         Data.Program = MenuGenerator.Generate(Data, Environment.TickCount);
         Data.StartDate = DateTime.Today;
         Save();
@@ -139,6 +166,7 @@ public class ProgramStore
             meal.Preparation = MenuGenerator.BuildPreparation(meal);
         }
 
+        NutritionCalculator.Recompute(meal);
         LastChange = $"C’est noté : {option.Label.ToLowerInvariant()} remplace votre choix.";
         Save();
     }

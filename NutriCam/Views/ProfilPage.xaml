@@ -9,7 +9,7 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:AppHeader ShowBack="True" />
 
-        <ScrollView Grid.Row="1">
+        <ScrollView x:Name="Scroller" Grid.Row="1">
             <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
                 <controls:ProgressSteps Step="1" />
                 <VerticalStackLayout Spacing="10">
@@ -20,44 +20,60 @@
 
                 <VerticalStackLayout Spacing="20">
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
-                        <controls:FormField Title="Âge" Placeholder="28" Suffix="ans" KeyboardType="Numeric"
+                        <controls:FormField x:Name="AgeField" Title="Âge" Placeholder="Votre âge" Suffix="ans" KeyboardType="Numeric"
                                             Text="{Binding AgeText, Mode=TwoWay}" Error="{Binding AgeError}" />
-                        <controls:FormField Grid.Column="1" Title="Taille" Placeholder="170" Suffix="cm" KeyboardType="Numeric"
+                        <controls:FormField x:Name="HeightField" Grid.Column="1" Title="Taille" Placeholder="Votre taille" Suffix="cm" KeyboardType="Numeric"
                                             Text="{Binding HeightText, Mode=TwoWay}" Error="{Binding HeightError}" />
                     </Grid>
-                    <controls:FormField Title="Poids" Placeholder="68" Suffix="kg" KeyboardType="Numeric"
+                    <controls:FormField x:Name="WeightField" Title="Poids" Placeholder="Votre poids" Suffix="kg" KeyboardType="Numeric"
                                         Text="{Binding WeightText, Mode=TwoWay}" Error="{Binding WeightError}" />
 
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Niveau d’activité" Style="{StaticResource Libelle}" />
-                        <controls:SegmentedControl Items="Faible,Modéré,Élevé" SelectedIndex="{Binding ActivityIndex, Mode=TwoWay}" />
+                    <VerticalStackLayout x:Name="SexBlock" Spacing="8">
+                        <Label Text="Sexe" Style="{StaticResource Libelle}" />
+                        <controls:SegmentedControl Items="Femme,Homme" SelectedIndex="{Binding SexIndex, Mode=TwoWay}" />
+                        <Label Text="{Binding SexError}" Style="{StaticResource Erreur}"
+                               IsVisible="{Binding SexError, Converter={StaticResource NotEmpty}}" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Repas par jour" Style="{StaticResource Libelle}" />
-                        <Border Style="{StaticResource Champ}" HeightRequest="56" Padding="10,0">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border WidthRequest="34" HeightRequest="34" BackgroundColor="{StaticResource Creme}"
-                                        StrokeThickness="0" StrokeShape="RoundRectangle 10">
-                                    <Label Text="{x:Static h:Icons.Minus}" Style="{StaticResource Icone}"
-                                           TextColor="{StaticResource Encre}" />
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding DecreaseCommand}" />
-                                    </Border.GestureRecognizers>
-                                </Border>
-                                <Label Grid.Column="1" Text="{Binding MealsLabel}" FontFamily="InterSemiBold" FontSize="15"
-                                       TextColor="{StaticResource Encre}" HorizontalOptions="Center" VerticalOptions="Center" />
-                                <Border Grid.Column="2" WidthRequest="34" HeightRequest="34" BackgroundColor="{StaticResource Teinte}"
-                                        StrokeThickness="0" StrokeShape="RoundRectangle 10">
-                                    <Label Text="{x:Static h:Icons.Plus}" Style="{StaticResource Icone}"
-                                           TextColor="{StaticResource Terracotta}" />
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding IncreaseCommand}" />
-                                    </Border.GestureRecognizers>
-                                </Border>
-                            </Grid>
-                        </Border>
+                    <VerticalStackLayout x:Name="ActivityBlock" Spacing="8">
+                        <Label Text="Niveau d’activité" Style="{StaticResource Libelle}" />
+                        <controls:SegmentedControl Items="Faible,Modéré,Élevé" SelectedIndex="{Binding ActivityIndex, Mode=TwoWay}" />
+                        <Label Text="{Binding ActivityError}" Style="{StaticResource Erreur}"
+                               IsVisible="{Binding ActivityError, Converter={StaticResource NotEmpty}}" />
                     </VerticalStackLayout>
+
+                    <VerticalStackLayout x:Name="MealsBlock" Spacing="8">
+                        <Label Text="Repas par jour" Style="{StaticResource Libelle}" />
+                        <controls:SegmentedControl Items="2 repas,3 repas,4 repas,5 repas" SelectedIndex="{Binding MealsIndex, Mode=TwoWay}" />
+                        <Label Text="{Binding MealsError}" Style="{StaticResource Erreur}"
+                               IsVisible="{Binding MealsError, Converter={StaticResource NotEmpty}}" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="HealthBlock" Spacing="12">
+                    <Label Text="Votre santé" Style="{StaticResource SectionTitre}" />
+                    <Label Text="Êtes-vous concerné(e) par l’une de ces situations ? Dans ce cas, un suivi médical est nécessaire."
+                           Style="{StaticResource Note}" />
+                    <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Conditions}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource Champ}" HeightRequest="-1" MinimumHeightRequest="50" Padding="10,2">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                                        <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Color="{StaticResource Terracotta}"
+                                                  VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding Label}" FontFamily="InterRegular" FontSize="14"
+                                               TextColor="{StaticResource Encre}" VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Label Text="{Binding HealthError}" Style="{StaticResource Erreur}"
+                           IsVisible="{Binding HealthError, Converter={StaticResource NotEmpty}}" />
                 </VerticalStackLayout>
 
                 <Border Style="{StaticResource Conseil}">

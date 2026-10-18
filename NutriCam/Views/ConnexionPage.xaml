@@ -9,7 +9,7 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <controls:AppHeader ShowBack="True" />
 
-        <ScrollView Grid.Row="1">
+        <ScrollView x:Name="Scroller" Grid.Row="1">
             <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
                 <Border HeightRequest="172" StrokeThickness="0" StrokeShape="RoundRectangle 22">
                     <Image Source="petit_dejeuner.jpg" Aspect="AspectFill" />
@@ -19,10 +19,10 @@
                     <Label Text="Connectez-vous pour retrouver vos repas et votre programme." Style="{StaticResource Intro}" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="20">
-                    <controls:FormField Title="E-mail" Placeholder="Votre adresse e-mail"
+                    <controls:FormField x:Name="EmailField" Title="E-mail" Placeholder="Votre adresse e-mail"
                                         Text="{Binding Email, Mode=TwoWay}" Error="{Binding EmailError}"
                                         KeyboardType="Email" LeadingGlyph="{x:Static h:Icons.Mail}" />
-                    <controls:FormField Title="Mot de passe" Placeholder="Votre mot de passe"
+                    <controls:FormField x:Name="PasswordField" Title="Mot de passe" Placeholder="Votre mot de passe"
                                         Text="{Binding Password, Mode=TwoWay}" Error="{Binding PasswordError}"
                                         IsPasswordField="True" />
                     <Label Text="Mot de passe oublié ?" Style="{StaticResource Lien}">

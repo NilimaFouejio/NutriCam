@@ -19,5 +19,7 @@ public class MealItem
     public string Name => Meal.Name;
     public string Ingredients => Meal.VegetablesSummary;
     public string Image => Meal.Image;
+    public string Energy => Meal.KcalText;
+    public bool HasEnergy => Meal.HasKcal;
     public IRelayCommand OpenCommand { get; }
 }

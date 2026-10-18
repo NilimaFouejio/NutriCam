@@ -59,6 +59,9 @@ public partial class FormField : ContentView
         UpdateIcon();
     }
 
+    /// <summary>Place le curseur de saisie dans le champ (ouvre le clavier).</summary>
+    public void FocusInput() => Input.Focus();
+
     private void UpdateError()
     {
         var hasError = !string.IsNullOrWhiteSpace(Error);

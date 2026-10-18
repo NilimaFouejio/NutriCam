@@ -31,4 +31,5 @@ public static class Icons
     public const string Drumstick = "\ue25b";
     public const string Carrot = "\ue25a";
     public const string Wheat = "\ue39e";
+    public const string Sprout = "\ue1eb";
 }

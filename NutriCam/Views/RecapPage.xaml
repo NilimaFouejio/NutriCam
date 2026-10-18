@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.RecapPage">
+    <Grid>
+        <Grid RowDefinitions="Auto,*,Auto">
+            <controls:AppHeader ShowBack="True" />
+
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                    <controls:ProgressSteps Step="5" />
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Votre récapitulatif" Style="{StaticResource Titre}" />
+                        <Label Text="Voici ce que nous utilisons pour composer votre semaine. Touchez une ligne pour la modifier."
+                               Style="{StaticResource Intro}" />
+                    </VerticalStackLayout>
+
+                    <!-- Informations utilisées pour la génération -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Pour composer vos repas" Style="{StaticResource SectionTitre}" />
+                        <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Rows}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource Carte}" Padding="14">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                            <Border WidthRequest="40" HeightRequest="40" BackgroundColor="{StaticResource Fond}"
+                                                    StrokeThickness="0" StrokeShape="RoundRectangle 12" VerticalOptions="Start">
+                                                <Label Text="{Binding Glyph}" Style="{StaticResource Icone}" FontSize="20"
+                                                       TextColor="{StaticResource Terracotta}" />
+                                            </Border>
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                                <Label Text="{Binding Title}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource Encre}" />
+                                                <Label Text="{Binding Detail}" Style="{StaticResource Note}" FontSize="13" />
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="2" Text="Modifier" Style="{StaticResource Lien}" VerticalOptions="Start" />
+                                        </Grid>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding OpenCommand}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Besoin énergétique -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Votre besoin d’énergie" Style="{StaticResource SectionTitre}" />
+                        <Border BackgroundColor="{StaticResource Teinte}" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 18" Padding="18">
+                            <VerticalStackLayout Spacing="10">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{x:Static h:Icons.Utensils}" Style="{StaticResource Icone}"
+                                           TextColor="{StaticResource Terracotta}" />
+                                    <Label Text="{Binding EnergyHeadline}" FontFamily="OutfitSemiBold" FontSize="21"
+                                           TextColor="{StaticResource Encre}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Label Style="{StaticResource Note}"
+                                       Text="Estimation à partir de votre sexe, de votre âge, de votre taille, de votre poids, de votre niveau d’activité et de votre objectif. Chaque repas affiche sa valeur énergétique." />
+                                <Label Text="{Binding EnergyNote}" Style="{StaticResource Note}" FontFamily="InterSemiBold"
+                                       IsVisible="{Binding HasEnergyNote}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Activité physique suggérée -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Bouger un peu chaque semaine" Style="{StaticResource SectionTitre}" />
+
+                        <Border BackgroundColor="{StaticResource Teinte}" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 18" Padding="18">
+                            <VerticalStackLayout Spacing="10">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{x:Static h:Icons.Sprout}" Style="{StaticResource Icone}"
+                                           TextColor="{StaticResource Terracotta}" />
+                                    <Label Text="{Binding ActivityHeadline}" FontFamily="OutfitSemiBold" FontSize="19"
+                                           TextColor="{StaticResource Encre}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding ActivityNote}" Style="{StaticResource Note}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Sessions}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource Carte}" Padding="14">
+                                        <Grid ColumnDefinitions="78,*,Auto" ColumnSpacing="10">
+                                            <Label Text="{Binding Day}" FontFamily="InterSemiBold" FontSize="14"
+                                                   TextColor="{StaticResource Terracotta}" VerticalOptions="Start" />
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                <Label Text="{Binding Title}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource Encre}" />
+                                                <Label Text="{Binding Detail}" Style="{StaticResource Note}" FontSize="13" />
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="2" Text="{Binding Duration}" Style="{StaticResource Note}" FontSize="13"
+                                                   VerticalOptions="Start" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <Border Style="{StaticResource Conseil}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Label Text="{x:Static h:Icons.Info}" Style="{StaticResource Icone}" VerticalOptions="Start" />
+                            <Label Grid.Column="1" Style="{StaticResource Note}"
+                                   Text="Ces conseils sont des repères généraux, pas un avis médical. En cas de maladie, de grossesse ou de douleur, demandez l’avis d’un professionnel de santé avant de reprendre une activité." />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="14">
+                <Button Text="{Binding GenerateText}" Style="{StaticResource BoutonPrincipal}"
+                        ImageSource="{StaticResource IcoFlecheBlanche}"
+                        Command="{Binding GenerateCommand}" IsEnabled="{Binding IsNotBusy}" />
+                <Label Text="Vos choix restent modifiables." Style="{StaticResource Note}"
+                       FontSize="13" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Écran d'attente pendant la génération -->
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#E6FAF6F0">
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}" Color="{StaticResource Terracotta}" />
+                <Label Text="Nous composons votre semaine…" Style="{StaticResource SectionTitre}" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

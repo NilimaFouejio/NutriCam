@@ -15,6 +15,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("objectif", typeof(ObjectifPage));
         Routing.RegisterRoute("preferences", typeof(PreferencesPage));
         Routing.RegisterRoute("budget", typeof(BudgetPage));
+        Routing.RegisterRoute("recap", typeof(RecapPage));
+        Routing.RegisterRoute("orientation", typeof(OrientationPage));
         Routing.RegisterRoute("repas", typeof(DetailRepasPage));
         Routing.RegisterRoute("alternatives", typeof(AlternativesPage));
         Routing.RegisterRoute("bilan", typeof(BilanPage));

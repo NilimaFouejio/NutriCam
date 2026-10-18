@@ -2,7 +2,7 @@ using NutriCam.Helpers;
 
 namespace NutriCam.Controls;
 
-/// <summary>« VOTRE PROGRAMME · n / 4 » avec la barre de progression à 4 segments.</summary>
+/// <summary>« VOTRE PROGRAMME · n / 5 » avec la barre de progression à 5 segments.</summary>
 public partial class ProgressSteps : ContentView
 {
     public static readonly BindableProperty StepProperty =
@@ -18,8 +18,8 @@ public partial class ProgressSteps : ContentView
 
     private void Update()
     {
-        StepLabel.Text = $"VOTRE PROGRAMME · {Step} / 4";
-        var bars = new[] { Bar1, Bar2, Bar3, Bar4 };
+        StepLabel.Text = $"VOTRE PROGRAMME · {Step} / 5";
+        var bars = new[] { Bar1, Bar2, Bar3, Bar4, Bar5 };
         for (var i = 0; i < bars.Length; i++)
             bars[i].Color = i < Step ? Palette.Terracotta : Palette.Bordure;
     }

@@ -27,7 +27,12 @@ public partial class ConnexionViewModel : BaseViewModel
         EmailError = Validation.Email(Email);
         PasswordError = Validation.Required(Password, "Saisissez votre mot de passe.");
         FormError = "";
-        if (EmailError != "" || PasswordError != "") return;
+        var firstMissing = EmailError != "" ? "email" : PasswordError != "" ? "password" : null;
+        if (firstMissing is not null)
+        {
+            ScrollTo(firstMissing);
+            return;
+        }
 
         IsBusy = true;
         var (ok, error) = await _auth.LoginAsync(Email, Password);
@@ -40,6 +45,7 @@ public partial class ConnexionViewModel : BaseViewModel
         }
 
         Store.EditMode = false;
+        if (Store.IsBlocked) { await Go("//accueil/orientation"); return; }
         if (Store.HasProgram) { await Go("//dashboard"); return; }
         await Go("//accueil/profil");
     }

@@ -3,11 +3,12 @@
              x:Class="NutriCam.Controls.ProgressSteps">
     <VerticalStackLayout Spacing="10">
         <Label x:Name="StepLabel" Style="{StaticResource Surtitre}" />
-        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
+        <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
             <BoxView x:Name="Bar1" Grid.Column="0" HeightRequest="3" CornerRadius="2" />
             <BoxView x:Name="Bar2" Grid.Column="1" HeightRequest="3" CornerRadius="2" />
             <BoxView x:Name="Bar3" Grid.Column="2" HeightRequest="3" CornerRadius="2" />
             <BoxView x:Name="Bar4" Grid.Column="3" HeightRequest="3" CornerRadius="2" />
+            <BoxView x:Name="Bar5" Grid.Column="4" HeightRequest="3" CornerRadius="2" />
         </Grid>
     </VerticalStackLayout>
 </ContentView>

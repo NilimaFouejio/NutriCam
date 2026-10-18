@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:NutriCam.Controls"
+             xmlns:h="clr-namespace:NutriCam.Helpers"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             x:Class="NutriCam.Views.OrientationPage">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:AppHeader ShowBack="True" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,18,24,16" Spacing="24">
+                <Border WidthRequest="56" HeightRequest="56" BackgroundColor="{StaticResource Teinte}"
+                        StrokeThickness="0" StrokeShape="RoundRectangle 28" HorizontalOptions="Start">
+                    <Label Text="{x:Static h:Icons.CircleAlert}" Style="{StaticResource Icone}" FontSize="28"
+                           TextColor="{StaticResource Terracotta}" />
+                </Border>
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Consultez un médecin nutritionniste" Style="{StaticResource Titre}" />
+                    <Label Text="{Binding Declared}" Style="{StaticResource Intro}"
+                           IsVisible="{Binding Declared, Converter={StaticResource NotEmpty}}" />
+                    <Label Style="{StaticResource Intro}"
+                           Text="Pour votre sécurité, NutriCam ne propose pas de programme alimentaire dans cette situation. Votre alimentation doit être adaptée à votre état de santé, avec un suivi personnalisé." />
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Conseil}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Text="{x:Static h:Icons.Info}" Style="{StaticResource Icone}" VerticalOptions="Start" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="8">
+                            <Label Text="Que faire ?" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource Encre}" />
+                            <Label Style="{StaticResource Note}"
+                                   Text="Prenez rendez-vous avec un médecin nutritionniste, ou avec le spécialiste qui suit votre maladie. Il construira avec vous une alimentation adaptée et sûre." />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Label Style="{StaticResource Note}" FontSize="13"
+                       Text="NutriCam propose des repères alimentaires généraux. Ce n’est pas un avis médical. Vous vous êtes trompé(e) en répondant ? Vous pouvez modifier vos réponses." />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="24,12,24,20" Spacing="12">
+            <Button Text="J’ai compris" Style="{StaticResource BoutonPrincipal}" Command="{Binding UnderstoodCommand}" />
+            <Button Text="Modifier mes réponses" Style="{StaticResource BoutonSecondaire}" Command="{Binding ChangeAnswersCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

@@ -35,7 +35,10 @@ public partial class ProgrammeViewModel : BaseViewModel
         foreach (var meal in Store.MealsOfDay(tab.Index))
             Meals.Add(new MealItem(meal, meal.Moment == "Déjeuner", OpenMeal));
 
-        SectionTitle = $"{Store.DayName(tab.Index)} · {Meals.Count} repas";
+        var kcal = NutritionCalculator.DayKcal(Meals.Select(m => m.Meal));
+        SectionTitle = kcal > 0
+            ? $"{Store.DayName(tab.Index)} · {Meals.Count} repas · ≈ {kcal:N0} kcal"
+            : $"{Store.DayName(tab.Index)} · {Meals.Count} repas";
     }
 
     private async void OpenMeal(Meal meal)

@@ -66,7 +66,10 @@ public partial class AlternativesViewModel : BaseViewModel
 
         Options.Clear();
         foreach (var choice in choices)
-            Options.Add(new OptionItem(choice.Label, choice.Label, choice.Hint, choice.Icon, Select));
+        {
+            var kcal = NutritionCalculator.OptionKcal(choice, _category, _meal);
+            Options.Add(new OptionItem(choice.Label, choice.Label, $"{choice.Hint} · ≈ {kcal} kcal", choice.Icon, Select));
+        }
 
         HasOptions = Options.Count > 0;
         EmptyMessage = HasOptions ? "" : "Aucune alternative ne correspond à vos préférences pour le moment.";

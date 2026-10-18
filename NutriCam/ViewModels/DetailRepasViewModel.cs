@@ -18,6 +18,9 @@ public partial class DetailRepasViewModel : BaseViewModel
     [ObservableProperty] private string momentLine = "";
     [ObservableProperty] private string name = "";
     [ObservableProperty] private string description = "";
+    [ObservableProperty] private string energyLine = "";
+    [ObservableProperty] private string energyNote = "";
+    [ObservableProperty] private bool hasEnergyNote;
     [ObservableProperty] private string image = "dejeuner.jpg";
     [ObservableProperty] private string preparation = "";
     [ObservableProperty] private string replaceText = "";
@@ -33,16 +36,23 @@ public partial class DetailRepasViewModel : BaseViewModel
         MomentLine = $"{Store.DayName(meal.DayIndex)} · {meal.Moment}".ToUpperInvariant();
         Name = meal.Name;
         Description = meal.Description;
+
+        var energy = NutritionCalculator.Breakdown(meal);
+        EnergyLine = meal.HasKcal ? $"Valeur énergétique : {meal.KcalText}" : "";
+        EnergyNote = meal.Complement is null && meal.HasKcal
+            ? "Estimation pour une assiette sans complément : un féculent ajoute environ 250 kcal."
+            : "";
+        HasEnergyNote = EnergyNote.Length > 0;
         Image = meal.Image;
         Preparation = meal.Preparation;
         DoneText = DoneLabel(meal);
 
         Categories.Clear();
-        Categories.Add(new CategoryItem(FoodCategory.Legumes, "LÉGUMES · REPÈRE ½", string.Join(", ", meal.Vegetables), "", Select));
-        Categories.Add(new CategoryItem(FoodCategory.Proteines, "PROTÉINES · REPÈRE ¼", meal.Protein, "", Select));
+        Categories.Add(new CategoryItem(FoodCategory.Legumes, $"LÉGUMES · REPÈRE ½ · ≈ {energy.Vegetables} kcal", string.Join(", ", meal.Vegetables), "", Select));
+        Categories.Add(new CategoryItem(FoodCategory.Proteines, $"PROTÉINES · REPÈRE ¼ · ≈ {energy.Protein} kcal", meal.Protein, "", Select));
         Categories.Add(new CategoryItem(
             FoodCategory.Complement,
-            "COMPLÉMENT · REPÈRE ¼",
+            meal.Complement is null ? "COMPLÉMENT · REPÈRE ¼" : $"COMPLÉMENT · REPÈRE ¼ · ≈ {energy.Complement} kcal",
             meal.Complement ?? "À compléter selon votre envie",
             meal.Complement is null ? "Par exemple du riz, non visible sur la photo." : "Non visible sur la photo.",
             Select));

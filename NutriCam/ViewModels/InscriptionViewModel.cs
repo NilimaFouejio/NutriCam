@@ -33,7 +33,16 @@ public partial class InscriptionViewModel : BaseViewModel
         PasswordError = Validation.NewPassword(Password);
         ConfirmationError = Confirmation == Password ? "" : "Les deux mots de passe sont différents.";
         FormError = "";
-        if (FirstNameError != "" || EmailError != "" || PasswordError != "" || ConfirmationError != "") return;
+        var firstMissing =
+            FirstNameError != "" ? "firstName" :
+            EmailError != "" ? "email" :
+            PasswordError != "" ? "password" :
+            ConfirmationError != "" ? "confirmation" : null;
+        if (firstMissing is not null)
+        {
+            ScrollTo(firstMissing);
+            return;
+        }
 
         IsBusy = true;
         var (ok, error) = await _auth.RegisterAsync(FirstName, Email, Password);

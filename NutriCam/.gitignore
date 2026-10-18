@@ -1,0 +1,14 @@
+## .NET / MAUI
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+*.log
+## Rider / VS Code
+.vscode/
+## Divers
+.DS_Store
+Thumbs.db

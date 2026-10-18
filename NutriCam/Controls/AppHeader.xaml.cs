@@ -31,5 +31,5 @@ public partial class AppHeader : ContentView
     }
 
     private async void OnBackTapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("..");
+        => await Nav.GoAsync("..");
 }

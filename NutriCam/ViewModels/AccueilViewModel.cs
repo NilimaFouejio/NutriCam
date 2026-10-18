@@ -7,10 +7,32 @@ public partial class AccueilViewModel : BaseViewModel
 {
     public AccueilViewModel(ProgramStore store) : base(store) { }
 
+    private bool _redirecting;
+
     public override void OnAppearing()
     {
         // Un utilisateur déjà connecté, avec un programme, retrouve directement son tableau de bord.
-        if (Store.Data.SignedIn && Store.HasProgram) MainThread.BeginInvokeOnMainThread(async () => await Go("//dashboard"));
+        if (_redirecting) return;
+        if (Store.Data.SignedIn && Store.HasProgram)
+        {
+            _redirecting = true;
+            _ = RedirectToDashboardAsync();
+        }
+    }
+
+    private async Task RedirectToDashboardAsync()
+    {
+        try
+        {
+            // Au lancement, Shell est encore en train d'afficher cette page : on le laisse terminer
+            // avant de naviguer, sinon : « Pending Navigations still processing ».
+            await Task.Delay(300);
+            await Go("//dashboard");
+        }
+        finally
+        {
+            _redirecting = false;
+        }
     }
 
     [RelayCommand]

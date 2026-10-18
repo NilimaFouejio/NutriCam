@@ -62,8 +62,8 @@ public static class MenuGenerator
     public static List<Meal> Generate(AppData data, int seed)
     {
         var rng = new Random(seed);
-        var moments = MomentsFor(data.Profile.MealsPerDay);
-        var budgetCost = (int)data.Budget + 1; // 1 économique, 2 moyen, 3 confort
+        var moments = MomentsFor(data.Profile.MealsPerDay ?? 3);
+        var budgetCost = (int)(data.Budget ?? BudgetLevel.Moyen) + 1; // 1 économique, 2 moyen, 3 confort
         var meals = new List<Meal>();
         var uses = new Dictionary<string, int>();
         var previous = new Dictionary<string, string>();
@@ -85,6 +85,8 @@ public static class MenuGenerator
                 meals.Add(ToMeal(pick, day));
             }
         }
+        // Valeur énergétique de chaque repas, avec des portions ajustées au besoin de la personne.
+        NutritionCalculator.ApplyToProgram(meals, NutritionCalculator.DailyTarget(data));
         return meals;
     }
 

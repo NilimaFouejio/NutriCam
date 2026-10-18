@@ -57,7 +57,7 @@ public static class MauiProgram
         builder.Services.AddTransient<InscriptionViewModel>();
         builder.Services.AddTransient<InscriptionPage>();
 
-        // Écrans 4 à 7 : parcours « Votre programme » 1/4 à 4/4
+        // Écrans 4 à 7 : parcours « Votre programme » 1/5 à 5/5
         builder.Services.AddTransient<ProfilViewModel>();
         builder.Services.AddTransient<ProfilPage>();
         builder.Services.AddTransient<ObjectifViewModel>();
@@ -66,6 +66,10 @@ public static class MauiProgram
         builder.Services.AddTransient<PreferencesPage>();
         builder.Services.AddTransient<BudgetViewModel>();
         builder.Services.AddTransient<BudgetPage>();
+        builder.Services.AddTransient<RecapViewModel>();
+        builder.Services.AddTransient<RecapPage>();
+        builder.Services.AddTransient<OrientationViewModel>();
+        builder.Services.AddTransient<OrientationPage>();
 
         // Écrans 8 et 9 : tableau de bord, programme de la semaine
         builder.Services.AddTransient<DashboardViewModel>();

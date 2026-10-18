@@ -11,6 +11,8 @@
                        TextColor="{StaticResource Encre}" />
                 <Label Text="{Binding Ingredients}" FontFamily="InterRegular" FontSize="12"
                        TextColor="{StaticResource EncreDouce}" />
+                <Label Text="{Binding Energy}" FontFamily="InterSemiBold" FontSize="12"
+                       TextColor="{StaticResource Terracotta}" IsVisible="{Binding HasEnergy}" />
             </VerticalStackLayout>
         </VerticalStackLayout>
         <Border.GestureRecognizers>

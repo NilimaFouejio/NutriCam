@@ -3,33 +3,36 @@ using NutriCam.Models;
 
 namespace NutriCam.Services;
 
-/// <summary>Aliments proposés dans l'application (contexte camerounais) et règles de compatibilité.</summary>
+/// <summary>
+/// Aliments proposés dans l'application (contexte camerounais) et règles de compatibilité.
+/// Les valeurs énergétiques sont des moyennes arrondies pour des aliments cuits (kcal pour 100 g) et une portion standard en grammes.
+/// </summary>
 public static class FoodCatalog
 {
     public static readonly FoodOption[] Proteins =
     {
-        new("Poulet grillé", "le poulet", "Grillé et bien assaisonné", Icons.Drumstick, "Faites griller le poulet assaisonné."),
-        new("Poisson", "le poisson", "À griller, selon ce que vous trouvez", Icons.Fish, "Faites griller le poisson assaisonné."),
-        new("Œufs", "les œufs", "Durs ou cuits à la poêle", Icons.Egg, "Faites cuire les œufs, durs ou à la poêle.", true),
-        new("Haricots", "les haricots", "À servir avec les légumes", Icons.Bean, "Faites mijoter les haricots avec un peu d’oignon.", true),
+        new("Poulet grillé", "le poulet", "Grillé et bien assaisonné", Icons.Drumstick, "Faites griller le poulet assaisonné.", false, 165, 150),
+        new("Poisson", "le poisson", "À griller, selon ce que vous trouvez", Icons.Fish, "Faites griller le poisson assaisonné.", false, 140, 180),
+        new("Œufs", "les œufs", "Durs ou cuits à la poêle", Icons.Egg, "Faites cuire les œufs, durs ou à la poêle.", true, 145, 150),
+        new("Haricots", "les haricots", "À servir avec les légumes", Icons.Bean, "Faites mijoter les haricots avec un peu d’oignon.", true, 130, 220),
     };
 
     public static readonly FoodOption[] Vegetables =
     {
-        new("Carottes, courgettes, brocoli, poivron", "ce choix de légumes", "Poêlés ensemble", Icons.Carrot),
-        new("Épinards, tomates, oignon", "ce choix de légumes", "Revenus à l’huile", Icons.Carrot),
-        new("Chou, carottes, haricots verts", "ce choix de légumes", "Sautés ou cuits à la vapeur", Icons.Carrot),
-        new("Gombo, aubergine, tomates", "ce choix de légumes", "Mijotés doucement", Icons.Carrot),
-        new("Concombre, tomate, laitue", "ce choix de légumes", "Crus, en salade", Icons.Carrot),
+        new("Carottes, courgettes, brocoli, poivron", "ce choix de légumes", "Poêlés ensemble", Icons.Carrot, "", false, 32, 250),
+        new("Épinards, tomates, oignon", "ce choix de légumes", "Revenus à l’huile", Icons.Carrot, "", false, 28, 250),
+        new("Chou, carottes, haricots verts", "ce choix de légumes", "Sautés ou cuits à la vapeur", Icons.Carrot, "", false, 35, 250),
+        new("Gombo, aubergine, tomates", "ce choix de légumes", "Mijotés doucement", Icons.Carrot, "", false, 30, 250),
+        new("Concombre, tomate, laitue", "ce choix de légumes", "Crus, en salade", Icons.Carrot, "", false, 15, 250),
     };
 
     public static readonly FoodOption[] Complements =
     {
-        new("Riz", "le riz", "Nature ou parfumé", Icons.Wheat),
-        new("Plantain", "le plantain", "Mûr ou vert, bouilli ou grillé", Icons.Wheat),
-        new("Manioc", "le manioc", "En bâton ou en couscous", Icons.Wheat),
-        new("Igname", "l’igname", "Bouillie ou en purée", Icons.Wheat),
-        new("Patate douce", "la patate douce", "Cuite à la vapeur", Icons.Wheat),
+        new("Riz", "le riz", "Nature ou parfumé", Icons.Wheat, "", false, 130, 220),
+        new("Plantain", "le plantain", "Mûr ou vert, bouilli ou grillé", Icons.Wheat, "", false, 120, 250),
+        new("Manioc", "le manioc", "En bâton ou en couscous", Icons.Wheat, "", false, 160, 190),
+        new("Igname", "l’igname", "Bouillie ou en purée", Icons.Wheat, "", false, 118, 220),
+        new("Patate douce", "la patate douce", "Cuite à la vapeur", Icons.Wheat, "", false, 90, 250),
     };
 
     public static FoodOption[] For(FoodCategory category) => category switch
