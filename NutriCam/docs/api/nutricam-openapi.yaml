@@ -1,0 +1,501 @@
+openapi: 3.0.3
+info:
+  title: NutriCam API
+  version: 1.0.0
+  description: |
+    Contrat entre l'application mobile NutriCam (.NET MAUI) et le backend.
+    Il est dérivé du schéma SQL NutriCam (14 tables). Hors périmètre, volontairement :
+    interface administrateur (aucune route d'écriture sur aliments, recettes, activités),
+    poids cible (poids_cible_kg), durées (duree_jours, duree_min, duree_recommandee_min) et ville.
+
+    Conventions
+    - Base : /api/v1. JSON UTF-8. Champs en snake_case, identiques aux colonnes SQL quand elles existent.
+    - Authentification : en-tête `Authorization: Bearer <jeton>` sur toutes les routes sauf /auth/*.
+    - Identifiants : UUID au format texte de 36 caractères (colonnes VARCHAR(36)). Ils sont générés par le serveur : la base n'a pas de valeur par défaut.
+    - Dates : `YYYY-MM-DD`. Horodatages : ISO 8601 UTC.
+    - Erreurs : toujours un objet `Erreur` ; `code` est stable et sert au client, `message` est affichable.
+    - Idempotence : POST /profils/moi/programmes exige l'en-tête `Idempotency-Key`. Même clé = même réponse, sans doublon.
+    - Un utilisateur n'accède qu'à ses propres données (le profil est toujours « moi », déduit du jeton).
+    - Les conditions de santé (maladies) restent sur l'appareil : elles ne sont jamais envoyées.
+servers:
+  - url: http://localhost:4010/api/v1
+    description: Serveur mock (Prism) ou API locale
+tags:
+  - name: Auth
+  - name: Profil
+  - name: Catalogue
+  - name: Programme
+  - name: Activite
+security:
+  - bearerAuth: []
+paths:
+  /auth/inscription:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Créer un compte (table utilisateurs)
+      operationId: inscrire
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InscriptionRequest' }
+      responses:
+        '201':
+          description: Compte créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '409': { $ref: '#/components/responses/Conflit' }
+        '422': { $ref: '#/components/responses/Validation' }
+  /auth/connexion:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Se connecter
+      operationId: connecter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConnexionRequest' }
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+  /utilisateurs/moi:
+    delete:
+      tags: [Auth]
+      summary: Supprimer mon compte et toutes mes données (cascade SQL)
+      operationId: supprimerCompte
+      responses:
+        '204': { description: Supprimé }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+  /profils/moi:
+    get:
+      tags: [Profil]
+      summary: Récupérer mon profil complet (restauration sur un nouvel appareil)
+      operationId: getProfil
+      responses:
+        '200':
+          description: Profil trouvé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfilComplet' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '404':
+          description: Aucun profil créé pour ce compte (code PROFIL_ABSENT)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erreur' }
+    put:
+      tags: [Profil]
+      summary: Créer ou remplacer mon profil, mon objectif et mes critères (idempotent)
+      description: |
+        Écrit en une transaction : profils, objectifs, criteres_alimentaires, preferences_alimentaires
+        (prefere / disponible) et aliments_a_eviter. Les listes envoyées REMPLACENT les anciennes.
+        Un aliment est résolu par `id_aliment` ; à défaut par `nom_aliment` (insensible à la casse et aux accents).
+        Un nom introuvable n'est pas une erreur : il est listé dans `avertissements`.
+      operationId: sauvegarderProfil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProfilComplet' }
+      responses:
+        '200':
+          description: Profil enregistré (avec les identifiants générés)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfilComplet' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '422': { $ref: '#/components/responses/Validation' }
+  /aliments:
+    get:
+      tags: [Catalogue]
+      summary: Catalogue des aliments (lecture seule)
+      description: Supporte `ETag` / `If-None-Match` (réponse 304 si inchangé).
+      operationId: getAliments
+      parameters:
+        - in: header
+          name: If-None-Match
+          schema: { type: string }
+      responses:
+        '200':
+          description: Liste des aliments
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Aliment' }
+        '304': { description: Catalogue inchangé }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+  /profils/moi/programmes:
+    post:
+      tags: [Programme]
+      summary: Associer à mon profil un programme de 7 jours compatible
+      description: |
+        Choisit un programme prédéfini compatible avec l'objectif, le budget et les aliments à éviter
+        (allergies strictes incluses), puis le rattache au profil. Retourne les 7 jours d'un coup.
+        Aucun programme compatible : 422 `AUCUN_PROGRAMME_COMPATIBLE`, rien n'est attribué.
+        Le profil doit exister (sinon 409 `PROFIL_INCOMPLET`).
+      operationId: creerProgramme
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreerProgrammeRequest' }
+      responses:
+        '201':
+          description: Programme créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Programme' }
+        '200':
+          description: "Requête déjà traitée (même Idempotency-Key), programme déjà créé renvoyé"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Programme' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '409':
+          description: Profil incomplet (code PROFIL_INCOMPLET)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erreur' }
+        '422':
+          description: Aucun programme compatible (code AUCUN_PROGRAMME_COMPATIBLE)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erreur' }
+  /programmes/{id_programme}/semaine:
+    get:
+      tags: [Programme]
+      summary: Les 7 jours du programme, sans le régénérer
+      operationId: getSemaine
+      parameters:
+        - { $ref: '#/components/parameters/IdProgramme' }
+      responses:
+        '200':
+          description: Programme
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Programme' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+  /programmes/{id_programme}/repas/{id_repas_programme}:
+    patch:
+      tags: [Programme]
+      summary: Marquer un repas comme mangé (ou annuler)
+      operationId: majRepas
+      parameters:
+        - { $ref: '#/components/parameters/IdProgramme' }
+        - in: path
+          name: id_repas_programme
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MajRepasRequest' }
+      responses:
+        '204': { description: Mis à jour }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+  /recettes/{id_recette}/alternatives:
+    get:
+      tags: [Programme]
+      summary: Recettes alternatives compatibles (table alternatives_repas)
+      description: Les alternatives passent par le même filtre « aliments à éviter » que les repas principaux.
+      operationId: getAlternatives
+      parameters:
+        - in: path
+          name: id_recette
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Alternatives (liste vide possible)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Recette' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+  /activites:
+    get:
+      tags: [Activite]
+      summary: Catalogue des activités physiques (lecture seule)
+      operationId: getActivites
+      responses:
+        '200':
+          description: Activités
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Activite' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+  /profils/moi/recommandations-activite:
+    get:
+      tags: [Activite]
+      summary: Recommandations d'activité indicatives pour mon profil
+      description: Recommandation non médicale, adaptée à l'objectif et au niveau d'activité.
+      operationId: getRecommandationsActivite
+      responses:
+        '200':
+          description: Recommandations (liste vide possible)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RecommandationActivite' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    IdProgramme:
+      in: path
+      name: id_programme
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    NonAuthentifie:
+      description: Jeton absent, invalide ou expiré (codes NON_AUTHENTIFIE, IDENTIFIANTS_INVALIDES)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erreur' }
+    Conflit:
+      description: Ressource déjà existante (code EMAIL_DEJA_UTILISE)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erreur' }
+    Validation:
+      description: Données invalides (code VALIDATION, `details` liste les champs)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erreur' }
+    Introuvable:
+      description: Ressource inexistante ou appartenant à un autre utilisateur (code INTROUVABLE)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erreur' }
+  schemas:
+    Erreur:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Code stable lu par le client.
+          enum: [NON_AUTHENTIFIE, IDENTIFIANTS_INVALIDES, EMAIL_DEJA_UTILISE, VALIDATION, INTROUVABLE, PROFIL_ABSENT, PROFIL_INCOMPLET, AUCUN_PROGRAMME_COMPATIBLE, ERREUR_SERVEUR]
+        message: { type: string, example: "Aucun programme ne correspond à vos critères. Ajustez-les et réessayez." }
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              champ: { type: string }
+              message: { type: string }
+    InscriptionRequest:
+      type: object
+      required: [nom, email, mot_de_passe]
+      properties:
+        nom: { type: string, maxLength: 100, example: Aïcha }
+        email: { type: string, format: email, maxLength: 255 }
+        mot_de_passe: { type: string, minLength: 8, description: "Envoyé en HTTPS uniquement ; le serveur stocke mot_de_passe_hash." }
+    ConnexionRequest:
+      type: object
+      required: [email, mot_de_passe]
+      properties:
+        email: { type: string, format: email }
+        mot_de_passe: { type: string }
+    Utilisateur:
+      type: object
+      required: [id_utilisateur, nom, email]
+      properties:
+        id_utilisateur: { type: string, format: uuid }
+        nom: { type: string }
+        email: { type: string, format: email }
+    Session:
+      type: object
+      required: [jeton, utilisateur]
+      properties:
+        jeton: { type: string }
+        expire_le: { type: string, format: date-time }
+        utilisateur: { $ref: '#/components/schemas/Utilisateur' }
+    Profil:
+      type: object
+      required: [age, taille_cm, poids_actuel_kg]
+      properties:
+        id_profil: { type: string, format: uuid, readOnly: true }
+        age: { type: integer, minimum: 1 }
+        taille_cm: { type: number, minimum: 1, example: 168 }
+        poids_actuel_kg: { type: number, minimum: 1, example: 72.5 }
+        niveau_activite: { type: string, enum: [faible, modere, eleve] }
+        sexe:
+          type: string
+          enum: [femme, homme]
+          description: AJOUT au schéma SQL (profils.sexe). Sert au besoin énergétique.
+        repas_par_jour:
+          type: integer
+          minimum: 2
+          maximum: 5
+          description: AJOUT au schéma SQL (profils.repas_par_jour).
+    Objectif:
+      type: object
+      description: Table objectifs (id_objectif, id_profil, type_objectif). Le serveur garde un seul objectif courant par profil et le met à jour en place.
+      required: [type_objectif]
+      properties:
+        id_objectif: { type: string, format: uuid, readOnly: true }
+        type_objectif: { type: string, enum: [perte_de_poids, maintien, prise_de_poids] }
+    AlimentRef:
+      type: object
+      description: Référence à un aliment. Au moins un des deux champs.
+      properties:
+        id_aliment: { type: string, format: uuid }
+        nom_aliment: { type: string, example: Plantain }
+    Evitement:
+      type: object
+      description: Aliment à éviter (table aliments_a_eviter).
+      properties:
+        id_aliment: { type: string, format: uuid }
+        nom_aliment: { type: string, example: Arachides }
+        motif:
+          type: string
+          enum: [preference, allergie, intolerance, autre]
+          description: AJOUT au schéma SQL (aliments_a_eviter.motif). `allergie` = exclusion stricte.
+    Criteres:
+      type: object
+      required: [budget]
+      properties:
+        budget: { type: string, enum: [economique, moyen, confort] }
+        aliments_preferes:
+          type: array
+          items: { $ref: '#/components/schemas/AlimentRef' }
+        aliments_disponibles:
+          type: array
+          items: { $ref: '#/components/schemas/AlimentRef' }
+        aliments_a_eviter:
+          type: array
+          items: { $ref: '#/components/schemas/Evitement' }
+    ProfilComplet:
+      type: object
+      required: [profil, objectif, criteres]
+      properties:
+        profil: { $ref: '#/components/schemas/Profil' }
+        objectif: { $ref: '#/components/schemas/Objectif' }
+        criteres: { $ref: '#/components/schemas/Criteres' }
+        id_programme_courant:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        avertissements:
+          type: array
+          readOnly: true
+          items: { type: string }
+          example: ["Aliment non reconnu : « Piment »"]
+    Aliment:
+      type: object
+      required: [id_aliment, nom_aliment]
+      properties:
+        id_aliment: { type: string, format: uuid }
+        nom_aliment: { type: string }
+        categorie:
+          type: string
+          enum: [legume, proteine, feculent, autre]
+          description: Convention du contrat pour la colonne libre aliments.categorie.
+        energie_kcal_100g: { type: number }
+        proteines_100g: { type: number }
+        glucides_100g: { type: number }
+        lipides_100g: { type: number }
+    Ingredient:
+      type: object
+      required: [id_aliment, nom_aliment, quantite, unite, apport_energetique_kcal]
+      properties:
+        id_aliment: { type: string, format: uuid }
+        nom_aliment: { type: string }
+        categorie: { type: string, enum: [legume, proteine, feculent, autre] }
+        quantite: { type: number }
+        unite: { type: string, example: g }
+        apport_energetique_kcal: { type: number }
+    Recette:
+      type: object
+      required: [id_recette, nom_recette, valeur_energetique_totale_kcal, ingredients]
+      properties:
+        id_recette: { type: string, format: uuid }
+        nom_recette: { type: string }
+        description: { type: string, nullable: true, description: "AJOUT au schéma SQL (recettes.description)." }
+        preparation: { type: string, nullable: true, description: "AJOUT au schéma SQL (recettes.preparation)." }
+        valeur_energetique_totale_kcal: { type: number, description: Pour UNE portion. }
+        ingredients:
+          type: array
+          items: { $ref: '#/components/schemas/Ingredient' }
+    RepasProgramme:
+      type: object
+      required: [id_repas_programme, numero_jour, type_repas, nombre_portions, recette]
+      properties:
+        id_repas_programme: { type: string, format: uuid }
+        numero_jour: { type: integer, minimum: 1, maximum: 7 }
+        type_repas: { type: string, enum: [petit_dejeuner, dejeuner, diner, collation] }
+        nombre_portions: { type: number, minimum: 0.01 }
+        est_realise: { type: boolean, default: false, description: "AJOUT au schéma SQL (repas_programme.est_realise)." }
+        recette: { $ref: '#/components/schemas/Recette' }
+    Programme:
+      type: object
+      required: [id_programme, date_debut, repas]
+      properties:
+        id_programme: { type: string, format: uuid }
+        id_objectif: { type: string, format: uuid }
+        date_creation: { type: string, format: date-time }
+        date_debut: { type: string, format: date }
+        repas:
+          type: array
+          description: Tous les repas des 7 jours, triés par numero_jour puis par ordre de la journée.
+          items: { $ref: '#/components/schemas/RepasProgramme' }
+        avertissements:
+          type: array
+          items: { type: string }
+          description: Ex. compatibilité non garantie (contamination croisée possible).
+    CreerProgrammeRequest:
+      type: object
+      required: [date_debut]
+      properties:
+        date_debut: { type: string, format: date }
+        regenerer:
+          type: boolean
+          default: false
+          description: Vrai pour remplacer le programme courant par un autre programme compatible.
+    MajRepasRequest:
+      type: object
+      properties:
+        est_realise: { type: boolean }
+    Activite:
+      type: object
+      required: [id_activite, nom_activite]
+      properties:
+        id_activite: { type: string, format: uuid }
+        nom_activite: { type: string }
+        description: { type: string, nullable: true }
+        niveau: { type: string, nullable: true }
+        objectif_associe: { type: string, nullable: true, enum: [perte_de_poids, maintien, prise_de_poids] }
+    RecommandationActivite:
+      type: object
+      required: [id_recommandation, activite]
+      properties:
+        id_recommandation: { type: string, format: uuid }
+        activite: { $ref: '#/components/schemas/Activite' }
+        frequence_hebdomadaire: { type: integer, minimum: 1, nullable: true }

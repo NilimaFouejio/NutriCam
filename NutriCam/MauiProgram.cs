@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NutriCam.Api;
+using NutriCam.Data;
 using NutriCam.Services;
 using NutriCam.ViewModels;
 using NutriCam.Views;
@@ -45,8 +47,24 @@ public static class MauiProgram
 #endif
         });
 
-        // Services (état partagé, authentification locale)
+        // Couche données : persistance locale (fichiers JSON) et jeton dans le stockage sécurisé
+        builder.Services.AddSingleton<IAppDataRepository, JsonAppDataRepository>();
+        builder.Services.AddSingleton<ICatalogCache, JsonCatalogCache>();
+        builder.Services.AddSingleton<ITokenStore, SecureTokenStore>();
+
+        // Couche API : un seul HttpClient pour toute l'application
+        builder.Services.AddSingleton(_ => new HttpClient
+        {
+            BaseAddress = new Uri(ApiSettings.BaseUrl),
+            Timeout = ApiSettings.Timeout
+        });
+        builder.Services.AddSingleton<INutriCamApi, NutriCamApiClient>();
+
+        // Couche services : état partagé, catalogues, profil, programme, authentification
         builder.Services.AddSingleton<ProgramStore>();
+        builder.Services.AddSingleton<CatalogService>();
+        builder.Services.AddSingleton<ProfileService>();
+        builder.Services.AddSingleton<ProgramService>();
         builder.Services.AddSingleton<AuthService>();
 
         // Écran 1 à 3 : accueil, connexion, inscription

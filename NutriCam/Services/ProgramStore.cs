@@ -1,5 +1,7 @@
 using System.Text.Json;
+using NutriCam.Api.Dtos;
 using NutriCam.Helpers;
+using NutriCam.Mapping;
 using NutriCam.Models;
 
 namespace NutriCam.Services;
@@ -114,6 +116,19 @@ public class ProgramStore
         if (IsBlocked) return; // sécurité : aucun programme pour une personne qui doit consulter un médecin
         Data.Program = MenuGenerator.Generate(Data, Environment.TickCount);
         Data.StartDate = DateTime.Today;
+        Save();
+    }
+
+    /// <summary>
+    /// Remplace le programme local par celui renvoyé par l'API (création ou restauration sur un nouvel appareil).
+    /// Les repas, leurs identifiants serveur, la date de début et l'identifiant du programme sont conservés ensemble.
+    /// </summary>
+    public void ApplyRemoteProgram(ProgrammeDto program)
+    {
+        Data.Program = ApiMapper.ToMeals(program);
+        Data.StartDate = ApiMapper.ParseDate(program.DateDebut);
+        Data.Remote.ProgramId = program.IdProgramme;
+        CurrentMeal = null;
         Save();
     }
 

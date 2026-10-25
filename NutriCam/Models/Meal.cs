@@ -18,6 +18,15 @@ public class Meal
     public string Preparation { get; set; } = "";
     public bool Done { get; set; }
 
+    /// <summary>id_repas_programme côté serveur (null pour un repas généré hors ligne).</summary>
+    public string? RemoteId { get; set; }
+
+    /// <summary>id_recette côté serveur : sert à demander les alternatives.</summary>
+    public string? RecipeId { get; set; }
+
+    /// <summary>Vrai quand « mangé / pas mangé » n'a pas encore pu être envoyé au serveur.</summary>
+    public bool DoneDirty { get; set; }
+
     /// <summary>Valeur énergétique estimée du repas, en kcal (0 = non calculée).</summary>
     public int Kcal { get; set; }
 
