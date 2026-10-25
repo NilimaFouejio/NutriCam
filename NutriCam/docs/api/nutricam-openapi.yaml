@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: NutriCam API
-  version: 1.0.0
+  version: 1.1.0
   description: |
     Contrat entre l'application mobile NutriCam (.NET MAUI) et le backend.
     Il est dérivé du schéma SQL NutriCam (14 tables). Hors périmètre, volontairement :
@@ -138,42 +138,104 @@ paths:
   /profils/moi/programmes:
     post:
       tags: [Programme]
-      summary: Associer à mon profil un programme de 7 jours compatible
+      summary: Générer un programme alimentaire personnalisé de 7 jours
       description: |
-        Choisit un programme prédéfini compatible avec l'objectif, le budget et les aliments à éviter
-        (allergies strictes incluses), puis le rattache au profil. Retourne les 7 jours d'un coup.
-        Aucun programme compatible : 422 `AUCUN_PROGRAMME_COMPATIBLE`, rien n'est attribué.
-        Le profil doit exister (sinon 409 `PROFIL_INCOMPLET`).
+        Compose dynamiquement un programme de sept jours à partir du profil
+        de l'utilisateur authentifié, de son objectif, de ses caractéristiques
+        physiques, de ses critères alimentaires, des aliments disponibles,
+        des recettes et des règles métier documentées et validées.
+
+        Le profil est récupéré côté serveur à partir du jeton d'authentification.
+        Le client ne peut pas fournir un profil de substitution dans cette requête.
+
+        Le backend utilise les aliments, recettes, ingrédients, quantités,
+        valeurs nutritionnelles et règles provenant des données de référence.
+        Il distingue les règles explicites, les données sources, les calculs
+        déduits et les hypothèses. Une hypothèse ne devient jamais une règle
+        officielle sans validation métier.
+
+        Le backend vérifie la complétude du profil, les unités, les quantités,
+        les densités énergétiques, les apports par ingrédient, les totaux par
+        repas et par journée, ainsi que les écarts aux cibles énergétiques.
+        Les valeurs absentes ne sont pas inventées et les anomalies ne sont
+        pas corrigées silencieusement.
+
+        La répartition de référence documentée est : petit-déjeuner 25 %,
+        déjeuner 55 %, dîner 20 %. Elle ne s'applique que dans le cadre prévu
+        par les documents métier validés. La somme des pourcentages et les
+        règles d'arrondi sont contrôlées.
+
+        Les profils de démonstration des documents ne sont pas des règles
+        universelles. Une cible énergétique directement fournie par une
+        source est conservée. Elle n'est pas recalculée à partir des données
+        personnelles en l'absence d'une formule explicitement validée.
+
+        Les contraintes de composition confirmées par les documents sont
+        appliquées comme règles explicites : petit-déjeuner adapté au profil,
+        déjeuner avec accompagnement lorsque prévu, dîner sans féculent
+        d'accompagnement dans le programme de référence, et exclusion des
+        jus et smoothies au déjeuner et au dîner lorsque cette règle s'applique.
+        Aucune recette manquante n'est inventée.
+
+        Les allergies entraînent une exclusion stricte, y compris pour les
+        ingrédients indirects des recettes. Les préférences, aliments
+        disponibles et budget sont pris en compte sans passer outre une
+        restriction stricte.
+
+        Le programme est enregistré uniquement après réussite des contrôles
+        obligatoires. Les ingrédients réellement utilisés, quantités calculées,
+        résultats de validation et versions des données/règles sont conservés
+        afin de permettre la traçabilité. La génération est déclenchée
+        uniquement par cet appel explicite ; consulter ou modifier le profil
+        ne déclenche jamais une génération.
+
+        Une même clé Idempotency-Key et un même contenu renvoient le résultat
+        initial sans créer de doublon. La réutilisation de la clé avec un
+        contenu différent est refusée.
       operationId: creerProgramme
       parameters:
         - in: header
           name: Idempotency-Key
           required: true
+          description: UUID unique pour cette opération de génération.
           schema: { type: string, format: uuid }
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: '#/components/schemas/CreerProgrammeRequest' }
+            example:
+              date_debut: "2026-11-01"
+              regenerer: false
       responses:
         '201':
-          description: Programme créé
+          description: Programme personnalisé généré et enregistré après validation
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Programme' }
         '200':
-          description: "Requête déjà traitée (même Idempotency-Key), programme déjà créé renvoyé"
+          description: "Requête déjà traitée avec la même clé et le même contenu ; programme initial renvoyé"
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Programme' }
         '401': { $ref: '#/components/responses/NonAuthentifie' }
         '409':
-          description: Profil incomplet (code PROFIL_INCOMPLET)
+          description: |
+            Profil incomplet (PROFIL_INCOMPLET) ou clé d'idempotence réutilisée
+            avec un contenu différent (CLE_IDEMPOTENCE_REUTILISEE).
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Erreur' }
         '422':
-          description: Aucun programme compatible (code AUCUN_PROGRAMME_COMPATIBLE)
+          description: |
+            Génération impossible : aucune combinaison compatible, données
+            nutritionnelles indispensables manquantes ou échec d'un contrôle
+            métier obligatoire.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erreur' }
+        '500':
+          description: Erreur technique pendant la génération
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Erreur' }
@@ -300,7 +362,7 @@ components:
         code:
           type: string
           description: Code stable lu par le client.
-          enum: [NON_AUTHENTIFIE, IDENTIFIANTS_INVALIDES, EMAIL_DEJA_UTILISE, VALIDATION, INTROUVABLE, PROFIL_ABSENT, PROFIL_INCOMPLET, AUCUN_PROGRAMME_COMPATIBLE, ERREUR_SERVEUR]
+          enum: [NON_AUTHENTIFIE, IDENTIFIANTS_INVALIDES, EMAIL_DEJA_UTILISE, VALIDATION, INTROUVABLE, PROFIL_ABSENT, PROFIL_INCOMPLET, AUCUN_PROGRAMME_COMPATIBLE, DONNEES_NUTRITIONNELLES_INCOMPLETES, ECHEC_VALIDATION_PROGRAMME, CLE_IDEMPOTENCE_REUTILISEE, ERREUR_SERVEUR]
         message: { type: string, example: "Aucun programme ne correspond à vos critères. Ajustez-les et réessayez." }
         details:
           type: array
@@ -344,16 +406,22 @@ components:
         age: { type: integer, minimum: 1 }
         taille_cm: { type: number, minimum: 1, example: 168 }
         poids_actuel_kg: { type: number, minimum: 1, example: 72.5 }
-        niveau_activite: { type: string, enum: [faible, modere, eleve] }
+        niveau_activite:
+          type: string
+          enum: [tres_sedentaire, legerement_actif, moderement_actif, tres_actif]
+          description: |
+            Profil d'activité du tableau « 5.2 Estimer la dépense énergétique totale » :
+            tres_sedentaire (facteur 1,2), legerement_actif (1,3–1,4), moderement_actif (1,5–1,6), tres_actif (1,7–1,9).
+            Le serveur retient le milieu de chaque fourchette (1,2 ; 1,35 ; 1,55 ; 1,8). Obligatoire pour générer un programme.
         sexe:
           type: string
           enum: [femme, homme]
           description: AJOUT au schéma SQL (profils.sexe). Sert au besoin énergétique.
         repas_par_jour:
           type: integer
-          minimum: 2
-          maximum: 5
-          description: AJOUT au schéma SQL (profils.repas_par_jour).
+          minimum: 3
+          maximum: 3
+          description: Fixé à 3 (petit-déjeuner, déjeuner, dîner). Facultatif dans la requête, toujours 3 dans la réponse.
     Objectif:
       type: object
       description: Table objectifs (id_objectif, id_profil, type_objectif). Le serveur garde un seul objectif courant par profil et le met à jour en place.
@@ -446,17 +514,41 @@ components:
           items: { $ref: '#/components/schemas/Ingredient' }
     RepasProgramme:
       type: object
-      required: [id_repas_programme, numero_jour, type_repas, nombre_portions, recette]
+      required: [id_repas_programme, numero_jour, type_repas, nombre_portions, recette, apport_energetique_total_kcal]
       properties:
         id_repas_programme: { type: string, format: uuid }
         numero_jour: { type: integer, minimum: 1, maximum: 7 }
         type_repas: { type: string, enum: [petit_dejeuner, dejeuner, diner, collation] }
-        nombre_portions: { type: number, minimum: 0.01 }
+        nombre_portions: { type: number, exclusiveMinimum: 0 }
         est_realise: { type: boolean, default: false, description: "AJOUT au schéma SQL (repas_programme.est_realise)." }
         recette: { $ref: '#/components/schemas/Recette' }
+        cible_energetique_kcal:
+          type: number
+          nullable: true
+          description: Cible énergétique du repas, uniquement si elle est définie par une règle métier applicable.
+        apport_energetique_total_kcal:
+          type: number
+          minimum: 0
+          description: Apport total des portions effectivement prévues, calculé à partir des ingrédients utilisés.
+        ecart_energetique_kcal:
+          type: number
+          nullable: true
+          description: Écart entre l'apport calculé et la cible du repas, si une cible existe.
+        ingredients_utilises:
+          type: array
+          description: Quantités réellement utilisées après adaptation éventuelle de la recette.
+          items:
+            type: object
+            required: [id_aliment, nom_aliment, quantite, unite, apport_energetique_kcal]
+            properties:
+              id_aliment: { type: string, format: uuid }
+              nom_aliment: { type: string }
+              quantite: { type: number, minimum: 0.000001 }
+              unite: { type: string, example: g }
+              apport_energetique_kcal: { type: number, minimum: 0 }
     Programme:
       type: object
-      required: [id_programme, date_debut, repas]
+      required: [id_programme, date_debut, repas, synthese_energetique, validation]
       properties:
         id_programme: { type: string, format: uuid }
         id_objectif: { type: string, format: uuid }
@@ -464,21 +556,83 @@ components:
         date_debut: { type: string, format: date }
         repas:
           type: array
-          description: Tous les repas des 7 jours, triés par numero_jour puis par ordre de la journée.
+          minItems: 21
+          description: Repas des sept jours, au minimum trois repas par jour, triés par jour et ordre de la journée.
           items: { $ref: '#/components/schemas/RepasProgramme' }
+        synthese_energetique: { $ref: '#/components/schemas/SyntheseEnergetique' }
+        validation: { $ref: '#/components/schemas/ValidationProgramme' }
+        version_regles:
+          type: string
+          description: Identifiant de version des règles métier appliquées.
+        version_donnees_nutritionnelles:
+          type: string
+          description: Version ou identifiant du jeu de données nutritionnelles utilisé.
         avertissements:
           type: array
           items: { type: string }
-          description: Ex. compatibilité non garantie (contamination croisée possible).
+          description: Avertissements non bloquants ; une allergie incompatible n'est jamais un simple avertissement.
+    SyntheseEnergetique:
+      type: object
+      required: [methode_calcul, repartition_repas, totaux_journaliers]
+      properties:
+        cible_energetique_journaliere_kcal:
+          type: number
+          nullable: true
+          description: Cible documentée et applicable ; null si aucune cible fiable n'est définie.
+        methode_calcul:
+          type: string
+          description: Identifiant de la méthode documentée et validée ; ne pas inventer de formule.
+        repartition_repas:
+          type: array
+          items:
+            type: object
+            required: [type_repas, pourcentage]
+            properties:
+              type_repas: { type: string, enum: [petit_dejeuner, dejeuner, diner] }
+              pourcentage: { type: number, minimum: 0, maximum: 100 }
+              cible_energetique_kcal: { type: number, nullable: true }
+        totaux_journaliers:
+          type: array
+          minItems: 7
+          maxItems: 7
+          items:
+            type: object
+            required: [numero_jour, apport_energetique_kcal]
+            properties:
+              numero_jour: { type: integer, minimum: 1, maximum: 7 }
+              apport_energetique_kcal: { type: number, minimum: 0 }
+              cible_energetique_kcal: { type: number, nullable: true }
+              ecart_energetique_kcal: { type: number, nullable: true }
+    ValidationProgramme:
+      type: object
+      required: [statut, controles]
+      properties:
+        statut:
+          type: string
+          enum: [valide, valide_avec_avertissements]
+        controles:
+          type: array
+          items:
+            type: object
+            required: [code, statut]
+            properties:
+              code: { type: string, description: Identifiant stable du contrôle métier. }
+              statut: { type: string, enum: [reussi, avertissement] }
+              message: { type: string }
+              ecart_kcal: { type: number, nullable: true }
     CreerProgrammeRequest:
       type: object
       required: [date_debut]
+      additionalProperties: false
       properties:
-        date_debut: { type: string, format: date }
+        date_debut:
+          type: string
+          format: date
+          description: Premier jour du programme personnalisé.
         regenerer:
           type: boolean
           default: false
-          description: Vrai pour remplacer le programme courant par un autre programme compatible.
+          description: Demande explicitement un nouveau programme calculé à partir du profil actuel et des règles applicables.
     MajRepasRequest:
       type: object
       properties:

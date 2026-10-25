@@ -17,7 +17,10 @@ public class UserProfile
     public double? WeightKg { get; set; }
     // Aucune valeur n'est choisie d'avance : null tant que la personne n'a pas répondu.
     public ActivityLevel? Activity { get; set; }
-    public int? MealsPerDay { get; set; }
+
+    /// <summary>Nombre de repas par jour : fixé à 3 (petit-déjeuner, déjeuner, dîner). La personne ne le choisit plus.</summary>
+    [JsonIgnore]
+    public int? MealsPerDay => 3;
 
     /// <summary>Sexe, utilisé pour estimer le besoin énergétique quotidien.</summary>
     public Sex? Sex { get; set; }

@@ -35,7 +35,14 @@ public static class NutritionCalculator
 
         var sexConstant = p.Sex switch { Sex.Homme => 5.0, Sex.Femme => -161.0, _ => -78.0 };
         var metabolism = 10 * weight + 6.25 * height - 5 * age + sexConstant;
-        var activity = p.Activity switch { ActivityLevel.Faible => 1.375, ActivityLevel.Eleve => 1.725, _ => 1.55 };
+        // Milieu des fourchettes du tableau 5.2 : 1,2 ; 1,3–1,4 ; 1,5–1,6 ; 1,7–1,9 (même choix que le serveur).
+        var activity = p.Activity switch
+        {
+            ActivityLevel.TresSedentaire => 1.2,
+            ActivityLevel.LegerementActif => 1.35,
+            ActivityLevel.TresActif => 1.8,
+            _ => 1.55
+        };
         var need = metabolism * activity;
 
         var adjustment = data.Goal switch

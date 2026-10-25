@@ -14,7 +14,7 @@ namespace NutriCam.ViewModels;
 public partial class RecapViewModel : BaseViewModel
 {
     private static readonly string[] GoalNames = { "Perdre du poids", "Maintenir mon poids", "Prendre du poids", "Mieux équilibrer mon alimentation" };
-    private static readonly string[] ActivityNames = { "faible", "modérée", "élevée" };
+    private static readonly string[] ActivityNames = { "très sédentaire", "légèrement active", "modérément active", "très active" };
     private static readonly string[] BudgetNames = { "économique", "moyen", "confort" };
 
     public RecapViewModel(ProgramStore store) : base(store) { }
@@ -50,7 +50,7 @@ public partial class RecapViewModel : BaseViewModel
 
         var sex = p.Sex is null ? "" : p.Sex == Sex.Homme ? "Homme · " : "Femme · ";
         var profile = p.Age is null ? "À renseigner" : $"{sex}{p.Age} ans · {p.HeightCm:0.#} cm · {p.WeightKg:0.#} kg";
-        var activityAndMeals = $"Activité {ActivityNames[(int)(p.Activity ?? ActivityLevel.Modere)]} · {p.MealsPerDay ?? 3} repas par jour";
+        var activityAndMeals = $"Activité {ActivityNames[(int)(p.Activity ?? ActivityLevel.ModerementActif)]} · 3 repas par jour";
 
         var tastes = new List<string>
         {

@@ -37,16 +37,21 @@
 
                     <VerticalStackLayout x:Name="ActivityBlock" Spacing="8">
                         <Label Text="Niveau d’activité" Style="{StaticResource Libelle}" />
-                        <controls:SegmentedControl Items="Faible,Modéré,Élevé" SelectedIndex="{Binding ActivityIndex, Mode=TwoWay}" />
+                        <Label Text="Choisissez selon votre activité réelle (travail, déplacements, tâches domestiques et sport), pas seulement le nombre de séances de sport."
+                               Style="{StaticResource Note}" />
+                        <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding ActivityOptions}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:OptionCard Title="{Binding Title}" Subtitle="{Binding Subtitle}"
+                                                         Glyph="{Binding Glyph}" IsSelected="{Binding IsSelected}"
+                                                         Command="{Binding SelectCommand}" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
                         <Label Text="{Binding ActivityError}" Style="{StaticResource Erreur}"
                                IsVisible="{Binding ActivityError, Converter={StaticResource NotEmpty}}" />
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout x:Name="MealsBlock" Spacing="8">
-                        <Label Text="Repas par jour" Style="{StaticResource Libelle}" />
-                        <controls:SegmentedControl Items="2 repas,3 repas,4 repas,5 repas" SelectedIndex="{Binding MealsIndex, Mode=TwoWay}" />
-                        <Label Text="{Binding MealsError}" Style="{StaticResource Erreur}"
-                               IsVisible="{Binding MealsError, Converter={StaticResource NotEmpty}}" />
+                        <Label Text="Votre programme comporte 3 repas par jour : petit-déjeuner, déjeuner et dîner."
+                               Style="{StaticResource Note}" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>
 

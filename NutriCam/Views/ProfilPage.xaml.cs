@@ -37,7 +37,6 @@ public partial class ProfilPage : ContentPage
             "weight" => WeightField,
             "sex" => SexBlock,
             "activity" => ActivityBlock,
-            "meals" => MealsBlock,
             "health" => HealthBlock,
             _ => null
         };

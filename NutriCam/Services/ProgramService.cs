@@ -38,8 +38,8 @@ public class ProgramService
 
         try
         {
-            // Démo : le serveur n'applique pas encore l'exclusion des aliments. On n'affiche donc pas ses
-            // « aliment non reconnu » (bruit), seulement les avertissements du programme (budget, repas par jour).
+            // Le serveur calcule le programme à partir du profil enregistré (cible énergétique, 3 repas par jour,
+            // allergies exclues strictement). On n'affiche que les avertissements du programme, pas les « aliment non reconnu ».
             await _profiles.PushAsync(ct);
             var warnings = new List<string>();
             var request = new CreerProgrammeRequest(DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), regenerate);
@@ -60,6 +60,10 @@ public class ProgramService
                     return new(ProgramOutcome.NoCompatible, e.Message, NoWarnings);
                 case ApiErrorKind.Unauthorized:
                     return new(ProgramOutcome.SessionExpired, e.Message, NoWarnings);
+                case ApiErrorKind.Conflict when e.Code == "CLE_IDEMPOTENCE_REUTILISEE":
+                    remote.PendingProgramKey = null; // la clé a déjà servi avec un autre contenu : la prochaine demande en prend une nouvelle
+                    _store.Save();
+                    return new(ProgramOutcome.Failed, e.Message, NoWarnings);
                 default:
                     return e.IsConnectivity
                         ? new(ProgramOutcome.Offline, e.Message, NoWarnings)

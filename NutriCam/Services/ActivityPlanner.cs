@@ -10,16 +10,17 @@ namespace NutriCam.Services;
 public static class ActivityPlanner
 {
     // Séances conseillées par semaine : ligne = objectif (Perdre, Maintenir, Prendre, Équilibrer),
-    // colonne = niveau d'activité actuel (Faible, Modéré, Élevé). On commence doucement quand le niveau est faible.
+    // colonne = niveau d'activité actuel (très sédentaire, légèrement actif, modérément actif, très actif).
+    // On commence doucement quand le niveau est bas.
     private static readonly int[][] Table =
     {
-        new[] { 3, 4, 5 },
-        new[] { 3, 3, 4 },
-        new[] { 2, 3, 3 },
-        new[] { 3, 3, 4 },
+        new[] { 3, 3, 4, 5 },
+        new[] { 3, 3, 3, 4 },
+        new[] { 2, 2, 3, 3 },
+        new[] { 3, 3, 3, 4 },
     };
 
-    private static readonly int[] MinutesByLevel = { 25, 35, 45 };
+    private static readonly int[] MinutesByLevel = { 25, 30, 35, 45 };
 
     private static readonly (string Title, string Detail) Marche =
         ("Marche rapide", "Un pas soutenu : vous pouvez parler, mais difficilement chanter.");
@@ -58,7 +59,7 @@ public static class ActivityPlanner
 
     private static int GoalIndex(AppData data) => (int)(data.Goal ?? Goal.Equilibrer);
 
-    private static int LevelIndex(AppData data) => (int)(data.Profile.Activity ?? ActivityLevel.Modere);
+    private static int LevelIndex(AppData data) => (int)(data.Profile.Activity ?? ActivityLevel.ModerementActif);
 
     private static bool IsMinor(AppData data) => data.Profile.Age is < 18;
 

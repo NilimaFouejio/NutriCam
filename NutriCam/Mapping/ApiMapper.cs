@@ -34,16 +34,20 @@ public static class ApiMapper
 
     private static string ToApi(ActivityLevel level) => level switch
     {
-        ActivityLevel.Faible => "faible",
-        ActivityLevel.Eleve => "eleve",
-        _ => "modere"
+        ActivityLevel.TresSedentaire => "tres_sedentaire",
+        ActivityLevel.LegerementActif => "legerement_actif",
+        ActivityLevel.TresActif => "tres_actif",
+        _ => "moderement_actif"
     };
 
-    private static ActivityLevel ActivityFromApi(string? value) => value switch
+    /// <summary>Valeur du serveur -> niveau local. Les anciennes valeurs (faible / modere / eleve) restent comprises.</summary>
+    private static ActivityLevel? ActivityFromApi(string? value) => value switch
     {
-        "faible" => ActivityLevel.Faible,
-        "eleve" => ActivityLevel.Eleve,
-        _ => ActivityLevel.Modere
+        "tres_sedentaire" => ActivityLevel.TresSedentaire,
+        "legerement_actif" or "faible" => ActivityLevel.LegerementActif,
+        "moderement_actif" or "modere" => ActivityLevel.ModerementActif,
+        "tres_actif" or "eleve" => ActivityLevel.TresActif,
+        _ => null
     };
 
     private static string ToApi(BudgetLevel budget) => budget switch
@@ -92,7 +96,7 @@ public static class ApiMapper
             p.Age ?? throw new InvalidOperationException("Âge manquant"),
             p.HeightCm ?? throw new InvalidOperationException("Taille manquante"),
             p.WeightKg ?? throw new InvalidOperationException("Poids manquant"),
-            ToApi(p.Activity ?? ActivityLevel.Modere),
+            ToApi(p.Activity ?? ActivityLevel.ModerementActif),
             p.Sex is null ? null : p.Sex == Sex.Homme ? "homme" : "femme",
             p.MealsPerDay);
 
@@ -121,7 +125,6 @@ public static class ApiMapper
         p.WeightKg = dto.Profil.PoidsActuelKg;
         p.Activity = ActivityFromApi(dto.Profil.NiveauActivite);
         p.Sex = dto.Profil.Sexe switch { "homme" => Sex.Homme, "femme" => Sex.Femme, _ => null };
-        p.MealsPerDay = dto.Profil.RepasParJour ?? 3;
         p.HealthChecked = true; // le serveur n'enregistre un profil qu'après la question de santé
 
         data.Goal = GoalFromApi(dto.Objectif.TypeObjectif, data.Goal);
